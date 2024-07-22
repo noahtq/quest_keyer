@@ -6,7 +6,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(quist_keyer main.cpp)
+add_executable(quist_keyer src/main.cpp
+        src/quist_keyer/facilities.cpp
+        src/quist_keyer/facilities.h)
 target_link_libraries(quist_keyer ${OpenCV_LIBS})
 
-add_subdirectory(Google_tests)
+add_subdirectory(tests/Google_tests)
