@@ -9,13 +9,22 @@
 #include <opencv2/opencv.hpp>
 
 namespace QuistKeyer {
+    enum class StatusCode {success = 200, path_not_found = 404};
+
     class ImageSeq {
         std::filesystem::path input_path = "";
         std::filesystem::path output_path = "";
-        cv::Mat input_image;
-        cv::Mat output_image;
+        cv::VideoCapture input_video;
+        std::vector<cv::Mat> output_frames;
     public:
-        ImageSeq(const std::filesystem::path& new_input_path);
+        // Constructors
+        ImageSeq() = default;
+
+        // Getters and setters
+        [[nodiscard]] cv::Mat get_frame(const int& frame_num) const { return output_frames[frame_num]; }
+
+        // Methods
+        StatusCode open(const std::filesystem::path& new_input_path);
     };
 
     class KeyContainer {
