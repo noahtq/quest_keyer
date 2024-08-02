@@ -1,17 +1,15 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
-#include "../include/quest_seq_lib.h"
+#include "quest_keyer/quest_keyer.h"
 
 using namespace std;
 
 int main()
 {
-    Quest::ImageSeq seq;
-    seq.open("../media/test_media/videos/image_sequences/small_dog_001/small_dog_001_%04d.png");
-    for (cv::Mat frame : seq) {
-        cv::GaussianBlur(frame, frame, cv::Size(55, 55), 0, 0, cv::BORDER_CONSTANT);
-    }
-    seq.render("../media/test_media/videos/image_sequences/small_dog_001_rendered/small_dog_001_rendered_%04d.png");
+    Quest::Keyer keyer;
+    keyer.image_seq.open("../media/test_media/videos/image_sequences/small_dog_001/small_dog_001_%04d.png");
+    keyer.chromaKey(cv::Scalar(133, 160, 69));
+    keyer.image_seq.render("../media/test_media/videos/image_sequences/small_dog_001_rendered/small_dog_001_rendered_%04d.png");
 
     return 0;
 }
