@@ -1,0 +1,6 @@
+# --- BACKEND ---
+
+cmake-build-debug
+.idea
+.DS_STORE
+media/test_media
