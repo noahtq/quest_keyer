@@ -12,6 +12,6 @@ include/quest_seq_lib.h
         src/quest_keyer/quest_keyer.cpp
         src/quest_keyer/quest_keyer.h)
 target_link_libraries(${FinalEXEName} ${OpenCV_LIBS})
-target_link_libraries(${FinalEXEName} ${CMAKE_SOURCE_DIR}/lib/libquest_image_seq_0.0.1.a)
+target_link_libraries(${FinalEXEName} ${CMAKE_SOURCE_DIR}/lib/libquest_image_seq_0.0.2.a)
 
 add_subdirectory(tests/Google_tests)

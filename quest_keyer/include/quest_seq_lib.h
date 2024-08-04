@@ -6,10 +6,12 @@
 
 namespace Quest {
     inline const std::vector<std::string> supported_image_extensions = {
-        ".png",
-        ".jpg",
-        ".jpeg"
+        ".png", ".jpg", ".jpeg", ".jpe", ".bmp", ".dib", ".jp2",
+        ".webp", ".ppm", ".pnm", ".sr", ".ras",
+        ".tiff", ".tif", ".hdr", ".pic"
     };
+
+    enum class SeqErrorCodes {Success = 0, BadPath, UnsupportedExtension};
 
     class SeqException: public std::exception {
         std::string message;
@@ -43,6 +45,7 @@ namespace Quest {
     };
 
     class ImageSeq {
+    protected:
         std::filesystem::path input_path = "";
         std::filesystem::path output_path = "";
         std::vector<cv::Mat> frames;
@@ -53,6 +56,7 @@ namespace Quest {
     public:
         // Constructors
         ImageSeq() = default;
+        ImageSeq(const ImageSeq& original); // Copy constructor
 
         // Getters and setters
         [[nodiscard]] std::filesystem::path get_input_path() const { return input_path; }
@@ -71,11 +75,25 @@ namespace Quest {
 
         // Operators
         cv::Mat& operator[](const int& index);
+        ImageSeq& operator=(const ImageSeq& original);
 
         // Image IO
-        bool open(const std::filesystem::path& new_input_path);
-        bool render(const std::filesystem::path& new_output_path);
+        Quest::SeqErrorCodes open(const std::filesystem::path& new_input_path);
+        Quest::SeqErrorCodes render(const std::filesystem::path& new_output_path);
+
+        // Friend Functions
+        friend void Copy(const ImageSeq& original, ImageSeq& copy);
     };
+
+    class Proxy : public ImageSeq {
+        double scale;
+    public:
+        explicit Proxy(const ImageSeq& original, double resize_scale = 0.5);
+    };
+
+    // Equality Operators
+    bool operator==(const ImageSeq& seq_1, const ImageSeq& seq_2);
+    inline bool operator!=(const ImageSeq& seq_1, const ImageSeq& seq_2) { return !(seq_1 == seq_2); }
 }
 
 #endif //QUEST_IMAGE_SEQ_LIB_LIBRARY_H
