@@ -4,15 +4,69 @@
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Dialog</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Quest Keyer</title>
   </head>
   <body>
-    <h1>Backend Output</h1>
-    <p id="output"></p>
-    <input type="number" id="number-value" />
-    <button type="button" id="btn-2">Test Backend</button>
-    <button type="button" id="btn">Open a File</button>
-    File path: <strong id="filePath"></strong>
+    <header>
+      <h1 class="title-bar">Quest Keyer</h1>
+    </header>
+    <main>
+        <div id="content-area">
+        <div id="top">
+          <div id="viewer">
+            <div id="image-display">
+              <img src="house_roof.jpg" alt="">
+              <img src="house_roof.jpg" alt="">
+            </div>
+
+            <div id="playback">
+              <div id="frame-num">
+                <p>0</p>
+              </div>
+              <div id="playback-btns">
+                <button>Start</button>
+                <button><</button>
+                <button>Play</button>
+                <button>></button>
+                <button>End</button>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div id="bottom">
+        <div id="io">
+          <h2>Files</h2>
+          <div class="file-field">
+            <input type="text" name="In Plate Location" id="input-path">
+            <button>Load</button>
+          </div>
+          <div class="file-field">
+            <input type="text" name="Output Location" id="output-path">
+            <button>Export</button>
+          </div>
+        </div>
+        <div id="keyer">
+          <h2>Keying Parameters</h2>
+          <div class="scalar">
+            <input type="number" name="Key Values" id="key-value-r">
+            <input type="number" name="Key Values" id="key-value-g">
+            <input type="number" name="Key Values" id="key-value-b">
+          </div>
+          <div>
+            <input type="range" min="1" max="255" value="50" name="Threshold Slider" id="key-threshold">
+          </div>
+          <div>
+            <button>Reset Key</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </main>
+    <footer>
+      <p>Developed by Noah Turnquist</p>
+      <a href="about.html">About</a>
+    </footer>
     <script src='./renderer.js'></script>
   </body>
 </html>
