@@ -4,6 +4,13 @@
 
 #include "quest_keyer.h"
 
+Quest::KeyerConfig::KeyerConfig(nlohmann::json config_params) {
+    temp_dir = std::filesystem::path(config_params.at("temp-dir-path"));
+    frontend_file = std::filesystem::path(config_params.at("frontend-data"));
+    backend_file = std::filesystem::path(config_params.at("backend-data"));
+}
+
+
 void Quest::Keyer::chromaKey(const cv::Scalar& key_value, const int& threshold) {
     cv::Scalar low_bound, high_bound;
     for (int i = 0; i < 3; i++) {

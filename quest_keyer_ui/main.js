@@ -9,16 +9,25 @@ async function handleFileOpen() {
   }
 }
 
+// async function handleBackendTest(event, num) {
+//   backend_path = path.join(__dirname, 'quest_keyer_0.0.1')
+//   let promise = new Promise((resolve, reject) => {
+//     exec(backend_path, [num], (err, data) => {
+//       // console.log(data.toString())
+//       if (err) reject(err)
+//       else resolve(data)
+//     })
+//   }) 
+//   return promise
+// }
+
 async function handleBackendTest(event, num) {
-  backend_path = path.join(__dirname, 'quest_keyer_0.0.1')
-  let promise = new Promise((resolve, reject) => {
-    exec(backend_path, [num], (err, data) => {
-      // console.log(data.toString())
-      if (err) reject(err)
-      else resolve(data)
-    })
-  }) 
-  return promise
+  const request = new Request("http://localhost:5555/test")
+
+  fetch(request).then((response) => response.json())
+  .then((data) => {
+    return data.pi
+  })
 }
 
 function createWindow () {

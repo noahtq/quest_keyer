@@ -8,7 +8,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(FinalEXEName "quest_keyer_${CMAKE_PROJECT_VERSION}") #Append software version number to end of executable
 
 add_executable(${FinalEXEName} src/main.cpp
-include/quest_seq_lib.h
+        include/quest_seq_lib.h
+        include/json.hpp
         src/quest_keyer/quest_keyer.cpp
         src/quest_keyer/quest_keyer.h)
 target_link_libraries(${FinalEXEName} ${OpenCV_LIBS})

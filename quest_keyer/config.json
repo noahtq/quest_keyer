@@ -1,0 +1,5 @@
+{
+  "temp-dir-path" : "./temp/",
+  "frontend-data" : "frontend_data.json",
+  "backend-data": "backend_data.json"
+}
