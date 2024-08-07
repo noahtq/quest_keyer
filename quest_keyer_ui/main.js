@@ -21,13 +21,30 @@ async function handleFileOpen() {
 //   return promise
 // }
 
-async function handleBackendTest(event, num) {
-  const request = new Request("http://localhost:5555/test")
+async function handleBackendTest(event) {
 
-  fetch(request).then((response) => response.json())
-  .then((data) => {
-    return data.pi
-  })
+  const url = "http://localhost:5555/questkeyerapi/keyerapi/init"
+  try {
+    const response = await fetch(url)
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(error.message)
+  }
+}
+
+async function handleBackendSend(event) {
+
+  const url = "http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=15&keyg=30&keyb=100&threshold=255"
+  try {
+    const response = await fetch(url)
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(error.message)
+  }
 }
 
 function createWindow () {
@@ -42,6 +59,7 @@ function createWindow () {
 app.whenReady().then(() => {
   ipcMain.handle('dialog:openFile', handleFileOpen)
   ipcMain.handle('testBackend', handleBackendTest)
+  ipcMain.handle('testBackendSend', handleBackendSend)
   createWindow()
 
   app.on('activate', () => {
