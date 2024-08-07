@@ -1,6 +1,17 @@
+#include <fstream>
 #include "QuestKeyerAPI_KeyerAPI.h"
+#include "../include/json.hpp"
 
 using namespace QuestKeyerAPI;
+using json = nlohmann::json;
+
+void KeyerConfig::populate(const std::filesystem::path& config_path) {
+    std::ifstream ifs(config_path);
+    json config_params = json::parse(ifs);
+    temp_path = std::filesystem::path(config_params.at("temp-dir-path"));
+    proxy_path = std::filesystem::path(config_params.at("proxy-dir-path"));
+}
+
 
 void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     LOG_DEBUG << "Initializing Program";

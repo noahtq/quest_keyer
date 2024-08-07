@@ -4,12 +4,6 @@
 
 #include "quest_keyer.h"
 
-void Quest::KeyerConfig::populate(const std::string& config_path) {
-    nlohmann::json config_params = nlohmann::json::parse(std::filesystem::path(config_path));
-    temp_dir = config_params.at("temp-dir-path");
-    proxy_path = config_params.at("proxy-dir-path");
-}
-
 void Quest::Keyer::chromaKey(const cv::Scalar& key_value, const int& threshold) {
     cv::Scalar low_bound, high_bound;
     for (int i = 0; i < 3; i++) {

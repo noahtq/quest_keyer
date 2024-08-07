@@ -6,16 +6,9 @@
 #define QUEST_KEYER_H
 
 #include <opencv2/opencv.hpp>
-#include "../include/json.hpp"
 #include "../include/quest_seq_lib.h"
 
 namespace Quest {
-    struct KeyerConfig {
-        std::string temp_dir;
-        std::string proxy_path;
-        void populate(const std::string& config_path);
-    };
-
     class Keyer {
         bool keyed = false;
     public:

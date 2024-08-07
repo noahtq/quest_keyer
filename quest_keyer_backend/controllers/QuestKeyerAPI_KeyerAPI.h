@@ -9,10 +9,16 @@ using namespace drogon;
 
 namespace QuestKeyerAPI
 {
+    struct KeyerConfig {
+        std::filesystem::path temp_path;
+        std::filesystem::path proxy_path;
+        void populate(const std::filesystem::path& config_path);
+    };
+
 class KeyerAPI : public drogon::HttpController<KeyerAPI>
 {
-    std::string config_path = "../quest_keyer/keyerconfig.json";
-    Quest::KeyerConfig keyer_config;
+    std::filesystem::path config_path = "../keyerconfig.json";
+    KeyerConfig keyer_config;
     Quest::Keyer seq_keyer;
 
   public:
