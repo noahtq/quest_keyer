@@ -4,11 +4,14 @@ using namespace QuestKeyerAPI;
 
 void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     LOG_DEBUG << "Initializing Program";
-    LOG_DEBUG << "Creating temp directory";
+
+    keyer_config.populate(config_path);
+
+    LOG_DEBUG << "Loading keyer config file";
 
     Json::Value ret;
     ret["result"] = "ok";
-    ret["keyer"] = seq_keyer.image_seq.get_frame_count();
+    ret["message"] = "Finished backend init";
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }

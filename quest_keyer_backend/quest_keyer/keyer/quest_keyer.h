@@ -6,16 +6,15 @@
 #define QUEST_KEYER_H
 
 #include <opencv2/opencv.hpp>
-
+#include "../include/json.hpp"
 #include "../include/quest_seq_lib.h"
 
 namespace Quest {
-    // struct KeyerConfig {
-    //     std::filesystem::path temp_dir;
-    //     std::filesystem::path frontend_file;
-    //     std::filesystem::path backend_file;
-    //     explicit KeyerConfig(nlohmann::json config_params);
-    // };
+    struct KeyerConfig {
+        std::string temp_dir;
+        std::string proxy_path;
+        void populate(const std::string& config_path);
+    };
 
     class Keyer {
         bool keyed = false;

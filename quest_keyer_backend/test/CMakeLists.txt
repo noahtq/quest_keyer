@@ -4,7 +4,8 @@ project(quest_keyer_backend_test CXX)
 add_executable(${PROJECT_NAME} test_main.cc
         ../controllers/QuestKeyerAPI_KeyerAPI.h
         ../quest_keyer/keyer/quest_keyer.h
-        ../quest_keyer/keyer/quest_keyer.h)
+        ../quest_keyer/keyer/quest_keyer.h
+        ../quest_keyer/include/json.hpp)
 
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method

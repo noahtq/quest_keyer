@@ -11,7 +11,8 @@ namespace QuestKeyerAPI
 {
 class KeyerAPI : public drogon::HttpController<KeyerAPI>
 {
-
+    std::string config_path = "../quest_keyer/keyerconfig.json";
+    Quest::KeyerConfig keyer_config;
     Quest::Keyer seq_keyer;
 
   public:

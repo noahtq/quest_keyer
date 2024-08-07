@@ -21,12 +21,11 @@ async function handleFileOpen() {
 //   return promise
 // }
 
-async function handleBackendTest(event) {
+async function backendInit(event) {
 
   const url = "http://localhost:5555/questkeyerapi/keyerapi/init"
   try {
     const response = await fetch(url)
-
     const data = await response.json()
     return data
   } catch (error) {
@@ -41,7 +40,13 @@ async function handleBackendSend(event) {
     const response = await fetch(url)
 
     const data = await response.json()
-    return data
+    if (data.result === 'ok') {
+      console.log("Initialized backend")
+      console.log("Message:" + data.message)
+    } else {
+      console.log("An error occured while initializing backend: " + data.response)
+    }
+    console.log("Message:" + data.message)
   } catch (error) {
     console.error(error.message)
   }
@@ -58,9 +63,10 @@ function createWindow () {
 
 app.whenReady().then(() => {
   ipcMain.handle('dialog:openFile', handleFileOpen)
-  ipcMain.handle('testBackend', handleBackendTest)
   ipcMain.handle('testBackendSend', handleBackendSend)
   createWindow()
+
+  backendInit()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
