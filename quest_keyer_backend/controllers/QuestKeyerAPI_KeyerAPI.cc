@@ -30,12 +30,78 @@ void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResp
         LOG_DEBUG << "Created temp directory";
     }
 
+    std::filesystem::create_directory(keyer_config.temp_path / keyer_config.proxy_path);
+
     Json::Value ret;
     ret["result"] = "ok";
     ret["message"] = "Finished backend init";
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
+
+    initialized = true;
 }
+
+void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, const std::string& input_path) {
+    assert(initialized);
+    LOG_DEBUG << "Opening Image Sequence";
+    LOG_DEBUG << input_path;
+
+    Quest::SeqErrorCodes code = seq_keyer.image_seq.open(std::filesystem::path(input_path));
+
+    Json::Value ret;
+    switch(code) {
+    case Quest::SeqErrorCodes::Success: {
+        LOG_DEBUG << "Succesfully opened image sequence";
+
+        std::filesystem::path proxy_dir = keyer_config.temp_path / keyer_config.proxy_path / std::to_string(proxy_id);
+        std::filesystem::create_directory(proxy_dir);
+
+        std::filesystem::path proxy_path =
+            proxy_dir / seq_keyer.image_seq.get_input_path().filename();
+        proxy_path.replace_extension(".jpg");
+
+        Quest::Proxy proxy_seq(seq_keyer.image_seq, 0.25);
+        code = proxy_seq.render(proxy_path);
+
+        if (code == Quest::SeqErrorCodes::Success) {
+            LOG_DEBUG << "Created proxy sequence at " << proxy_path.string();
+
+            ++proxy_id;
+
+            ret["result"] = "ok";
+            ret["message"] = "Successfully opened image sequence";
+            ret["proxy-path"] = proxy_path.string();
+        } else {
+            LOG_DEBUG << "Error: " << "Proxy sequence couldn't be created.";
+
+            ret["result"] = "fail";
+            ret["message"] = "There was an error creating the proxy sequence";
+        }
+        break;
+    }
+    case Quest::SeqErrorCodes::BadPath:
+        LOG_DEBUG << "Error: Bad Image Sequence Path";
+
+        ret["result"] = "fail";
+        ret["message"] = "Couldn't find an image sequence at the given path";
+        break;
+    case Quest::SeqErrorCodes::UnsupportedExtension:
+        LOG_DEBUG << "Error: Unsupported extensions";
+
+        ret["result"] = "fail";
+        ret["message"] = "Attempting to open an unsupported image type";
+        break;
+    default:
+        LOG_DEBUG << "Error: Unknown error";
+
+        ret["result"] = "fail";
+        ret["message"] = "An unknown error occured";
+    }
+
+    auto resp = HttpResponse::newHttpJsonResponse(ret);
+    callback(resp);
+}
+
 
 void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
     const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold) {
