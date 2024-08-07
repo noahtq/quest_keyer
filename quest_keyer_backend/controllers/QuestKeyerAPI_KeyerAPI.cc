@@ -3,10 +3,12 @@
 using namespace QuestKeyerAPI;
 
 void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
-    LOG_DEBUG << "Initializing Keyer";
+    LOG_DEBUG << "Initializing Program";
+    LOG_DEBUG << "Creating temp directory";
 
     Json::Value ret;
     ret["result"] = "ok";
+    ret["keyer"] = seq_keyer.image_seq.get_frame_count();
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }
