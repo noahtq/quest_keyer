@@ -18,7 +18,17 @@ void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResp
 
     keyer_config.populate(config_path);
 
-    LOG_DEBUG << "Loading keyer config file";
+    LOG_DEBUG << "Loaded keyer config file";
+
+    if (std::filesystem::is_directory(keyer_config.temp_path)) {
+        LOG_DEBUG << "Temp dir already exists, deleting contents";
+        for (const auto& entry : std::filesystem::directory_iterator(keyer_config.temp_path)) {
+            std::filesystem::remove_all(entry.path());
+        }
+    } else {
+        std::filesystem::create_directory(keyer_config.temp_path);
+        LOG_DEBUG << "Created temp directory";
+    }
 
     Json::Value ret;
     ret["result"] = "ok";
