@@ -52,7 +52,18 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
     case Quest::SeqErrorCodes::Success: {
         LOG_DEBUG << "Succesfully opened image sequence";
 
-        //TODO: probably turn all of this into separate function since it is being repeated x2
+        // Deallocate prior proxy object in case this function is run more than once, to avoid memory leaks
+        if (orig_proxy != nullptr) {
+            LOG_DEBUG << "Deallocating Proxy Object";
+            delete orig_proxy;
+            orig_proxy = nullptr;
+        }
+        if (keyer_proxy != nullptr) {
+            LOG_DEBUG << "Deallocating Proxy Object";
+            delete keyer_proxy;
+            keyer_proxy = nullptr;
+        }
+
         std::filesystem::path proxy_dir = keyer_config.temp_path / keyer_config.proxy_path / std::to_string(proxy_id);
         std::filesystem::create_directory(proxy_dir);
 
@@ -70,6 +81,7 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
         std::filesystem::path keyer_proxy_path =
             keyer_proxy_dir / keyer_seq.get_input_path().filename();
         keyer_proxy_path.replace_extension(".jpg");
+
         keyer_proxy = new Quest::Proxy(keyer_seq, 0.25);
         Quest::SeqErrorCodes code_2 = keyer_proxy->render((keyer_proxy_path));
 
@@ -123,3 +135,9 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }
+
+KeyerAPI::~KeyerAPI() {
+    delete orig_proxy;
+    delete keyer_proxy;
+}
+

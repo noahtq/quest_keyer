@@ -5,6 +5,12 @@ const origImg = document.getElementById('original-img')
 const keyedImg = document.getElementById('keyed-img')
 const frameNum = document.getElementById('frame-num')
 
+const startBtn = document.getElementById('start-btn')
+const prevFrameBtn = document.getElementById('prev-frame-btn')
+const playBtn = document.getElementById('play-btn')
+const nextFrameBtn = document.getElementById('next-frame-btn')
+const endBtn = document.getElementById('end-btn')
+
 let viewerState = {
     originalProxyPath: "",
     keyedProxyPath: "",
@@ -27,12 +33,11 @@ sequenceLoadBtn.addEventListener('click', async () => {
 })
 
 function replaceFramePaddingWithFrame(path, frameNum) {
-    // TODO: This will have to be fixed to work when the current frame is multiple digits
     const regex = /%\d\dd/
     const framePaddingIndex = path.search(regex)
     const framePadding = Number(path.slice(framePaddingIndex + 1, framePaddingIndex + 3))
     let numberStr = ""
-    for (let i = 0; i < framePadding - 1; i++) {
+    for (let i = 0; i < framePadding - String(frameNum).length; i++) {
         numberStr += "0"
     }
     numberStr += Number(frameNum)
@@ -45,8 +50,6 @@ function viewerUpdate(updateData) {
     viewerState.frameLength = updateData.frameLength
     const origFrame = replaceFramePaddingWithFrame(viewerState.originalProxyPath, viewerState.currentFrame)
     const keyedFrame = replaceFramePaddingWithFrame(viewerState.keyedProxyPath, viewerState.currentFrame)
-    console.log(origFrame)
-    console.log(keyedFrame)
 
     origImg.src = origFrame
     keyedImg.src = keyedFrame

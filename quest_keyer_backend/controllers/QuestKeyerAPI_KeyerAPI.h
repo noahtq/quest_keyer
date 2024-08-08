@@ -22,8 +22,8 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
     KeyerConfig keyer_config;
     bool initialized = false;
     Quest::ImageSeq keyer_seq;
-    Quest::Proxy *orig_proxy = nullptr; //TODO: make sure we're deallocating this guy once we're done with it. No memory leaks
-    Quest::Proxy *keyer_proxy = nullptr; //TODO: make sure we're deallocating this guy once we're done with it. No memory leaks
+    Quest::Proxy *orig_proxy = nullptr;
+    Quest::Proxy *keyer_proxy = nullptr;
     int proxy_id = 0;
 
   public:
@@ -40,5 +40,7 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
         const std::string &input_path);
     void ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
         const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold);
+
+    ~KeyerAPI();
 };
 }
