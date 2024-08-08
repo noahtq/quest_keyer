@@ -1,21 +1,38 @@
-const btn = document.getElementById('btn')
-const filePathElement = document.getElementById('filePath')
-const btn2 = document.getElementById('backend-test-btn')
-const output = document.getElementById('backend-test')
-const btn3 = document.getElementById('backend-test-send-btn')
-const output2 = document.getElementById('backend-test-send-data')
+const inputSearchBtn = document.getElementById('search-input-btn')
+const filePathElement = document.getElementById('input-path')
+const sequenceLoadBtn = document.getElementById('load-input-btn')
 
-// btn.addEventListener('click', async () => {
-//     const filePath = await window.electronAPI.openFile()
-//     filePathElement.innerText = filePath
-// })
+let viewerState = {
+    originalProxyPath: "",
+    keyedProxyPath: "",
+    currentFrame: 1,
+    frameLength: -1
+  }
 
-btn2.addEventListener('click', async () => {
-    const data = await window.electronAPI.backendTest()
-    output.innerText = data.result
+inputSearchBtn.addEventListener('click', async () => {
+    const filePath = await window.electronAPI.searchFile()
+    filePathElement.value = filePath
 })
 
-btn3.addEventListener('click', async () => {
-    const data = await window.electronAPI.sendBackendTest()
-    output2.innerText = data.key_r + " " + data.key_g + " " + data.key_b + " " + data.threshold
+sequenceLoadBtn.addEventListener('click', async () => {
+    if (filePathElement.value.length > 0) {
+        const filePath = await window.electronAPI.openSequence(filePathElement.value)
+    }
 })
+
+function replaceFramePaddingWithFrame(path, frameNum) {
+    const regex = "%\d\dd"
+    let framePadding = Number(path.search(regex).split("%")[1].split("d")[0])
+    let numberStr = ""
+    for (let i = 0; i < framePadding - 1; i++) {
+        numberStr += "0"
+    }
+    numberStr += Number(frameNum)
+    return path.replace(regex, frameNum)
+}
+
+function viewerUpdate(updateData) {
+    viewerState.originalProxyPath = updateData.originalProxyPath
+    viewerState.keyedProxyPath = updateData.keyedProxyPath
+    viewerState.frameLength = updateData.frameLength
+}

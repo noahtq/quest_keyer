@@ -22,6 +22,7 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
     KeyerConfig keyer_config;
     bool initialized = false;
     Quest::Keyer seq_keyer;
+    Quest::Proxy* keyer_proxy = nullptr; //TODO: make sure we're deallocating this guy once we're done with it. No memory leaks
     int proxy_id = 0;
 
   public:

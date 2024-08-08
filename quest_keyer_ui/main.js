@@ -1,33 +1,44 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
-var exec = require('child_process').execFile;
 const path = require('node:path')
 
-async function handleFileOpen() {
+async function handleFileSearch() {
   const { canceled, filePaths } = await dialog.showOpenDialog()
   if (!canceled) {
     return filePaths[0]
   }
 }
 
-// async function handleBackendTest(event, num) {
-//   backend_path = path.join(__dirname, 'quest_keyer_0.0.1')
-//   let promise = new Promise((resolve, reject) => {
-//     exec(backend_path, [num], (err, data) => {
-//       // console.log(data.toString())
-//       if (err) reject(err)
-//       else resolve(data)
-//     })
-//   }) 
-//   return promise
-// }
-
 async function backendInit(event) {
-
   const url = "http://localhost:5555/questkeyerapi/keyerapi/init"
   try {
     const response = await fetch(url)
     const data = await response.json()
     return data
+  } catch (error) {
+    console.error(error.message)
+  }
+}
+
+async function handleOpenSequence(event, sequencePath) {
+  sequenceModified = sequencePath.replace("%", "%25")
+  const url = `http://localhost:5555/questkeyerapi/keyerapi/open?path=${sequenceModified}`
+  try {
+    const response = await fetch(url)
+
+    const data = await response.json()
+    if (data.result === 'ok') {
+      console.log("Server received image")
+
+      let updateData = {
+        originalProxyPath: data.proxy-path,
+        keyedProxyPath: "",
+        frameLength: 
+      }
+      viewerState.originalSeqPath = data.proxy-path //TODO: update this
+    } else {
+      console.log("An error occured while while sending to backend: " + data.result)
+    }
+    console.log("Message: " + data.message)
   } catch (error) {
     console.error(error.message)
   }
@@ -62,8 +73,9 @@ function createWindow () {
 }
 
 app.whenReady().then(() => {
-  ipcMain.handle('dialog:openFile', handleFileOpen)
-  ipcMain.handle('testBackendSend', handleBackendSend)
+  ipcMain.handle('dialog:searchFile', handleFileSearch)
+  ipcMain.handle('keyer:initBackend', handleBackendSend)
+  ipcMain.handle('keyer:openSequence', handleOpenSequence)
   createWindow()
 
   backendInit()

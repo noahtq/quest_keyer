@@ -44,7 +44,6 @@ void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResp
 void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback, const std::string& input_path) {
     assert(initialized);
     LOG_DEBUG << "Opening Image Sequence";
-    LOG_DEBUG << input_path;
 
     Quest::SeqErrorCodes code = seq_keyer.image_seq.open(std::filesystem::path(input_path));
 
@@ -53,6 +52,7 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
     case Quest::SeqErrorCodes::Success: {
         LOG_DEBUG << "Succesfully opened image sequence";
 
+        //TODO: probably turn all of this into separate function since it is being repeated x2
         std::filesystem::path proxy_dir = keyer_config.temp_path / keyer_config.proxy_path / std::to_string(proxy_id);
         std::filesystem::create_directory(proxy_dir);
 
@@ -62,15 +62,25 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
 
         Quest::Proxy proxy_seq(seq_keyer.image_seq, 0.25);
         code = proxy_seq.render(proxy_path);
+        ++proxy_id;
 
-        if (code == Quest::SeqErrorCodes::Success) {
+        std::filesystem::path keyer_proxy_dir = keyer_config.temp_path / keyer_config.proxy_path / std::to_string(proxy_id);
+        std::filesystem::create_directory(keyer_proxy_dir);
+
+        std::filesystem::path keyer_proxy_path =
+            keyer_proxy_dir / seq_keyer.image_seq.get_input_path().filename();
+        keyer_proxy_path.replace_extension(".jpg");
+        keyer_proxy = new Quest::Proxy(seq_keyer.image_seq, 0.25);
+        Quest::SeqErrorCodes code_2 = keyer_proxy->render((keyer_proxy_path));
+
+        if (code == Quest::SeqErrorCodes::Success && code_2 == Quest::SeqErrorCodes::Success) {
             LOG_DEBUG << "Created proxy sequence at " << proxy_path.string();
-
-            ++proxy_id;
 
             ret["result"] = "ok";
             ret["message"] = "Successfully opened image sequence";
-            ret["proxy-path"] = proxy_path.string();
+            ret["orig-proxy-path"] = proxy_path.string();
+            ret["keyer-proxy-path"] = keyer_proxy_path.string();
+            ret["frame-count"] = seq_keyer.image_seq.get_frame_count();
         } else {
             LOG_DEBUG << "Error: " << "Proxy sequence couldn't be created.";
 
