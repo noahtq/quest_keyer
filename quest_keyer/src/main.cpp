@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
     // keyer.chromaKey(cv::Scalar(133, 160, 69), 5);
     // keyer.image_seq.render("../media/test_media/videos/image_sequences/small_dog_001_rendered/small_dog_001_rendered_%04d.png");
 
+
     if (argc == 1) {
         cout << "Quest Keyer\n";
     } else if (argc == 2) {

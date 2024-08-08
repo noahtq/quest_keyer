@@ -10,6 +10,7 @@ void KeyerConfig::populate(const std::filesystem::path& config_path) {
     json config_params = json::parse(ifs);
     temp_path = std::filesystem::path(config_params.at("temp-dir-path"));
     proxy_path = std::filesystem::path(config_params.at("proxy-dir-path"));
+    proxy_size = config_params.at("proxy-size");
 }
 
 
@@ -71,7 +72,7 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
             proxy_dir / keyer_seq.get_input_path().filename();
         proxy_path.replace_extension(".jpg");
 
-        orig_proxy = new Quest::Proxy(keyer_seq, 0.25);
+        orig_proxy = new Quest::Proxy(keyer_seq, keyer_config.proxy_size);
         code = orig_proxy->render(proxy_path);
         ++proxy_id;
 
@@ -82,7 +83,7 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
             keyer_proxy_dir / keyer_seq.get_input_path().filename();
         keyer_proxy_path.replace_extension(".jpg");
 
-        keyer_proxy = new Quest::Proxy(keyer_seq, 0.25);
+        keyer_proxy = new Quest::Proxy(keyer_seq, keyer_config.proxy_size);
         Quest::SeqErrorCodes code_2 = keyer_proxy->render((keyer_proxy_path));
 
         if (code == Quest::SeqErrorCodes::Success && code_2 == Quest::SeqErrorCodes::Success) {
@@ -124,14 +125,37 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
 
 
 void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
-    const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold) {
-    LOG_DEBUG << "Getting Key Parameters from Client";
+    const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold) const{
+    LOG_DEBUG << "Received Key Parameters from Client";
+    assert(keyer_seq.get_frame_count() > 0);
 
     Json::Value ret;
-    ret["key_r"] = key_r;
-    ret["key_g"] = key_g;
-    ret["key_b"] = key_b;
-    ret["threshold"] = threshold;
+    try {
+        const int r_val = std::stoi(key_r);
+        const int g_val = std::stoi(key_g);
+        const int b_val = std::stoi(key_b);
+        const int threshold_val = std::stoi(threshold);
+
+        if ((r_val >= 0 && r_val <= 255) &&
+            (g_val >= 0 && g_val <= 255) &&
+            (b_val >= 0 && b_val <= 255) &&
+            (threshold_val >= 0 && threshold_val <= 255)) {
+
+            Quest::ChromaKey(*orig_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val), threshold_val);
+            keyer_proxy->render(keyer_proxy->get_output_path());
+
+            LOG_DEBUG << "Successfully keyed image";
+            ret["result"] = "ok";
+            ret["message"] = "Successfully keyed image sequence";
+            ret["keyer-proxy-path"] = (std::filesystem::canonical(keyer_proxy->get_output_path().parent_path()) / keyer_proxy->get_output_path().filename()).string();
+        } else {
+            ret["result"] = "fail";
+            ret["message"] = "All of the key parameters must be between 0 and 255";
+        }
+    } catch(std::invalid_argument& e) {
+        ret["result"] = "fail";
+        ret["message"] = "All of the key parameters must be integers";
+    }
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }

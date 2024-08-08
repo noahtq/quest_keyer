@@ -4,7 +4,7 @@
 
 #include "quest_keyer.h"
 
-void Quest::chromaKey(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const int& threshold) {
+void Quest::ChromaKey(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const int& threshold) {
     cv::Scalar low_bound, high_bound;
     for (int i = 0; i < 3; i++) {
         low_bound[i] = key_value[i] - threshold;

@@ -9,7 +9,7 @@
 #include "../include/quest_seq_lib.h"
 
 namespace Quest {
-    void chromaKey(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const int& threshold);
+    void ChromaKey(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const int& threshold);
 }
 
 #endif //QUEST_KEYER_H

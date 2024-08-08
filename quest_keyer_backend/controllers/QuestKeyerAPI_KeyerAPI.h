@@ -13,6 +13,7 @@ namespace QuestKeyerAPI
     struct KeyerConfig {
         std::filesystem::path temp_path;
         std::filesystem::path proxy_path;
+        double proxy_size = 0.5;
         void populate(const std::filesystem::path& config_path);
     };
 
@@ -39,7 +40,7 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
     void OpenSeq(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
         const std::string &input_path);
     void ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
-        const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold);
+        const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold) const;
 
     ~KeyerAPI();
 };
