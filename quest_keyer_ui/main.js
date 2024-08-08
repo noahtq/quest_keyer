@@ -30,11 +30,15 @@ async function handleOpenSequence(event, sequencePath) {
       console.log("Server received image")
 
       let updateData = {
-        originalProxyPath: data.proxy-path,
-        keyedProxyPath: "",
-        frameLength: 
+        status: data.result,
+        originalProxyPath: data["orig-proxy-path"],
+        keyedProxyPath: data["keyer-proxy-path"],
+        frameLength: data["frame-count"]
       }
-      viewerState.originalSeqPath = data.proxy-path //TODO: update this
+
+      console.log(updateData)
+
+      return updateData;
     } else {
       console.log("An error occured while while sending to backend: " + data.result)
     }

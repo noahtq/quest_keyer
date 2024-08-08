@@ -21,8 +21,9 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
     std::filesystem::path config_path = "../keyerconfig.json";
     KeyerConfig keyer_config;
     bool initialized = false;
-    Quest::Keyer seq_keyer;
-    Quest::Proxy* keyer_proxy = nullptr; //TODO: make sure we're deallocating this guy once we're done with it. No memory leaks
+    Quest::ImageSeq keyer_seq;
+    Quest::Proxy *orig_proxy = nullptr; //TODO: make sure we're deallocating this guy once we're done with it. No memory leaks
+    Quest::Proxy *keyer_proxy = nullptr; //TODO: make sure we're deallocating this guy once we're done with it. No memory leaks
     int proxy_id = 0;
 
   public:

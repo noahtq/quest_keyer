@@ -45,7 +45,7 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
     assert(initialized);
     LOG_DEBUG << "Opening Image Sequence";
 
-    Quest::SeqErrorCodes code = seq_keyer.image_seq.open(std::filesystem::path(input_path));
+    Quest::SeqErrorCodes code = keyer_seq.open(std::filesystem::path(input_path));
 
     Json::Value ret;
     switch(code) {
@@ -57,30 +57,28 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
         std::filesystem::create_directory(proxy_dir);
 
         std::filesystem::path proxy_path =
-            proxy_dir / seq_keyer.image_seq.get_input_path().filename();
+            proxy_dir / keyer_seq.get_input_path().filename();
         proxy_path.replace_extension(".jpg");
 
-        Quest::Proxy proxy_seq(seq_keyer.image_seq, 0.25);
-        code = proxy_seq.render(proxy_path);
+        orig_proxy = new Quest::Proxy(keyer_seq, 0.25);
+        code = orig_proxy->render(proxy_path);
         ++proxy_id;
 
         std::filesystem::path keyer_proxy_dir = keyer_config.temp_path / keyer_config.proxy_path / std::to_string(proxy_id);
         std::filesystem::create_directory(keyer_proxy_dir);
 
         std::filesystem::path keyer_proxy_path =
-            keyer_proxy_dir / seq_keyer.image_seq.get_input_path().filename();
+            keyer_proxy_dir / keyer_seq.get_input_path().filename();
         keyer_proxy_path.replace_extension(".jpg");
-        keyer_proxy = new Quest::Proxy(seq_keyer.image_seq, 0.25);
+        keyer_proxy = new Quest::Proxy(keyer_seq, 0.25);
         Quest::SeqErrorCodes code_2 = keyer_proxy->render((keyer_proxy_path));
 
         if (code == Quest::SeqErrorCodes::Success && code_2 == Quest::SeqErrorCodes::Success) {
-            LOG_DEBUG << "Created proxy sequence at " << proxy_path.string();
-
             ret["result"] = "ok";
             ret["message"] = "Successfully opened image sequence";
-            ret["orig-proxy-path"] = proxy_path.string();
-            ret["keyer-proxy-path"] = keyer_proxy_path.string();
-            ret["frame-count"] = seq_keyer.image_seq.get_frame_count();
+            ret["orig-proxy-path"] = (std::filesystem::canonical(proxy_path.parent_path()) / proxy_path.filename()).string();
+            ret["keyer-proxy-path"] = (std::filesystem::canonical(keyer_proxy_path.parent_path()) / keyer_proxy_path.filename()).string();
+            ret["frame-count"] = keyer_seq.get_frame_count();
         } else {
             LOG_DEBUG << "Error: " << "Proxy sequence couldn't be created.";
 

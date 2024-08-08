@@ -1,6 +1,9 @@
 const inputSearchBtn = document.getElementById('search-input-btn')
 const filePathElement = document.getElementById('input-path')
 const sequenceLoadBtn = document.getElementById('load-input-btn')
+const origImg = document.getElementById('original-img')
+const keyedImg = document.getElementById('keyed-img')
+const frameNum = document.getElementById('frame-num')
 
 let viewerState = {
     originalProxyPath: "",
@@ -16,23 +19,36 @@ inputSearchBtn.addEventListener('click', async () => {
 
 sequenceLoadBtn.addEventListener('click', async () => {
     if (filePathElement.value.length > 0) {
-        const filePath = await window.electronAPI.openSequence(filePathElement.value)
+        const updateData = await window.electronAPI.openSequence(filePathElement.value)
+        if (updateData.status === 'ok') {
+            viewerUpdate(updateData)
+        }
     }
 })
 
 function replaceFramePaddingWithFrame(path, frameNum) {
-    const regex = "%\d\dd"
-    let framePadding = Number(path.search(regex).split("%")[1].split("d")[0])
+    // TODO: This will have to be fixed to work when the current frame is multiple digits
+    const regex = /%\d\dd/
+    const framePaddingIndex = path.search(regex)
+    const framePadding = Number(path.slice(framePaddingIndex + 1, framePaddingIndex + 3))
     let numberStr = ""
     for (let i = 0; i < framePadding - 1; i++) {
         numberStr += "0"
     }
     numberStr += Number(frameNum)
-    return path.replace(regex, frameNum)
+    return path.replace(regex, numberStr)
 }
 
 function viewerUpdate(updateData) {
     viewerState.originalProxyPath = updateData.originalProxyPath
     viewerState.keyedProxyPath = updateData.keyedProxyPath
     viewerState.frameLength = updateData.frameLength
+    const origFrame = replaceFramePaddingWithFrame(viewerState.originalProxyPath, viewerState.currentFrame)
+    const keyedFrame = replaceFramePaddingWithFrame(viewerState.keyedProxyPath, viewerState.currentFrame)
+    console.log(origFrame)
+    console.log(keyedFrame)
+
+    origImg.src = origFrame
+    keyedImg.src = keyedFrame
+    frameNum.innerHTML = viewerState.currentFrame
 }
