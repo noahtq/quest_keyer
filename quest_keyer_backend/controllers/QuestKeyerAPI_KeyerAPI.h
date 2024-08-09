@@ -33,15 +33,23 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
     METHOD_ADD(KeyerAPI::Init, "/init", Get);
     METHOD_ADD(KeyerAPI::OpenSeq, "/open?path={1}", Get);
     METHOD_ADD(KeyerAPI::ChromaKey, "/chromakey?keyr={1}&keyg={2}&keyb={3}&threshold={4}", Get);
+    METHOD_ADD(KeyerAPI::ExportSeq, "/export?path={1}&keyr={2}&keyg={3}&keyb={4}&threshold={5}", Get);
 
     METHOD_LIST_END
 
+    // API Endpoint Handlers
     void Init(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback);
     void OpenSeq(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
         const std::string &input_path);
     void ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
         const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold) const;
+    void ExportSeq(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
+        const std::string &output_path,
+        const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold);
 
+    // Destructor
     ~KeyerAPI();
 };
+    // Helper functions
+    bool VerifyKeyValues(const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold);
 }

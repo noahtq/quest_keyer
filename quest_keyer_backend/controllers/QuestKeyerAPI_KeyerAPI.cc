@@ -130,6 +130,78 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
     assert(keyer_seq.get_frame_count() > 0);
 
     Json::Value ret;
+    if (VerifyKeyValues(key_r, key_g, key_b, threshold)) {
+        const int r_val = std::stoi(key_r);
+        const int g_val = std::stoi(key_g);
+        const int b_val = std::stoi(key_b);
+        const int threshold_val = std::stoi(threshold);
+
+        Quest::ChromaKey(*orig_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        keyer_proxy->render(keyer_proxy->get_output_path());
+
+        LOG_DEBUG << "Successfully keyed image";
+        ret["result"] = "ok";
+        ret["message"] = "Successfully keyed image sequence";
+        ret["keyer-proxy-path"] = (std::filesystem::canonical(keyer_proxy->get_output_path().parent_path()) / keyer_proxy->get_output_path().filename()).string();
+    } else {
+        ret["result"] = "fail";
+        ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255";
+    }
+
+    auto resp = HttpResponse::newHttpJsonResponse(ret);
+    callback(resp);
+}
+
+void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
+    const std::string& output_path,
+    const std::string& key_r, const std::string& key_g, const std::string& key_b, const std::string& threshold) {
+    LOG_DEBUG << "Exporting image sequence";
+    assert(keyer_seq.get_frame_count() > 0);
+
+    Json::Value ret;
+    if (VerifyKeyValues(key_r, key_g, key_b, threshold)) {
+        const int r_val = std::stoi(key_r);
+        const int g_val = std::stoi(key_g);
+        const int b_val = std::stoi(key_b);
+        const int threshold_val = std::stoi(threshold);
+
+        Quest::ImageSeq export_seq = keyer_seq;
+        Quest::ChromaKey(keyer_seq, export_seq, cv::Scalar(r_val, g_val, b_val), threshold_val);
+
+        try {
+            Quest::SeqErrorCodes code = export_seq.render(output_path);
+            switch (code) {
+            case Quest::SeqErrorCodes::Success:
+                ret["result"] = "ok";
+                ret["message"] = "Succesfully exported image sequence";
+                ret["exported-path"] = output_path;
+                break;
+            case Quest::SeqErrorCodes::BadPath:
+                ret["result"] = "fail";
+                ret["message"] = "Could not find specified export directory";
+                break;
+            case Quest::SeqErrorCodes::UnsupportedExtension:
+                ret["result"] = "fail";
+                ret["message"] = "Unfortunately that file extension is not supported";
+                break;
+            default:
+                ret["result"] = "fail";
+                ret["message"] = "An unknown error occured while exporting image sequence";
+            }
+        } catch (Quest::SeqException& e) {
+            ret["result"] = "fail";
+            ret["message"] = e.what();
+        }
+    } else {
+        ret["result"] = "fail";
+        ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255";
+    }
+    
+    auto resp = HttpResponse::newHttpJsonResponse(ret);
+    callback(resp);
+}
+
+bool QuestKeyerAPI::VerifyKeyValues(const std::string& key_r, const std::string& key_g, const std::string& key_b, const std::string& threshold) {
     try {
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
@@ -140,24 +212,11 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
             (g_val >= 0 && g_val <= 255) &&
             (b_val >= 0 && b_val <= 255) &&
             (threshold_val >= 0 && threshold_val <= 255)) {
-
-            Quest::ChromaKey(*orig_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val), threshold_val);
-            keyer_proxy->render(keyer_proxy->get_output_path());
-
-            LOG_DEBUG << "Successfully keyed image";
-            ret["result"] = "ok";
-            ret["message"] = "Successfully keyed image sequence";
-            ret["keyer-proxy-path"] = (std::filesystem::canonical(keyer_proxy->get_output_path().parent_path()) / keyer_proxy->get_output_path().filename()).string();
-        } else {
-            ret["result"] = "fail";
-            ret["message"] = "All of the key parameters must be between 0 and 255";
-        }
-    } catch(std::invalid_argument& e) {
-        ret["result"] = "fail";
-        ret["message"] = "All of the key parameters must be integers";
+            return true;
+        } return false;
+    } catch (std::invalid_argument& e) {
+        return false;
     }
-    auto resp = HttpResponse::newHttpJsonResponse(ret);
-    callback(resp);
 }
 
 KeyerAPI::~KeyerAPI() {

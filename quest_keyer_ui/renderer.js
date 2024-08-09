@@ -2,7 +2,9 @@ const playbackFPS = 30
 
 // IO elements
 const inputSearchBtn = document.getElementById('search-input-btn')
+const outputSearchBtn = document.getElementById('search-output-btn')
 const filePathElement = document.getElementById('input-path')
+const outputPathElement = document.getElementById('output-path')
 const sequenceLoadBtn = document.getElementById('load-input-btn')
 
 // Viewer elements
@@ -31,6 +33,11 @@ let viewerState = {
 inputSearchBtn.addEventListener('click', async () => {
     const filePath = await window.electronAPI.searchFile()
     filePathElement.value = filePath
+})
+
+outputSearchBtn.addEventListener('click', async () => {
+    const filePath = await window.electronAPI.searchFile()
+    outputPathElement.value = filePath
 })
 
 sequenceLoadBtn.addEventListener('click', async () => {
