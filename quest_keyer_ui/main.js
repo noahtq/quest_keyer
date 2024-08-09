@@ -36,8 +36,6 @@ async function handleOpenSequence(event, sequencePath) {
         frameLength: data["frame-count"]
       }
 
-      console.log(updateData)
-
       return updateData;
     } else {
       console.log("An error occured while while sending to backend: " + data.result)
@@ -48,18 +46,23 @@ async function handleOpenSequence(event, sequencePath) {
   }
 }
 
-async function handleBackendSend(event) {
+async function handleChromaKey(event, red, green, blue, threshold) {
 
-  const url = "http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=15&keyg=30&keyb=100&threshold=255"
+  const url = `http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}`
   try {
     const response = await fetch(url)
 
     const data = await response.json()
     if (data.result === 'ok') {
-      console.log("Initialized backend")
-      console.log("Message:" + data.message)
+      console.log("Successfully keyed image sequence")
+      
+      let updateData = {
+        status: data.result,
+        keyedProxyPath: data["keyer-proxy-path"],
+      }
+      return updateData
     } else {
-      console.log("An error occured while initializing backend: " + data.response)
+      console.log("An error occured while keying image: " + data.result)
     }
     console.log("Message:" + data.message)
   } catch (error) {
@@ -78,8 +81,8 @@ function createWindow () {
 
 app.whenReady().then(() => {
   ipcMain.handle('dialog:searchFile', handleFileSearch)
-  ipcMain.handle('keyer:initBackend', handleBackendSend)
   ipcMain.handle('keyer:openSequence', handleOpenSequence)
+  ipcMain.handle('keyer:chromaKey', handleChromaKey)
   createWindow()
 
   backendInit()

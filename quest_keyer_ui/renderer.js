@@ -1,15 +1,23 @@
+// IO elements
 const inputSearchBtn = document.getElementById('search-input-btn')
 const filePathElement = document.getElementById('input-path')
 const sequenceLoadBtn = document.getElementById('load-input-btn')
+
+// Viewer elements
 const origImg = document.getElementById('original-img')
 const keyedImg = document.getElementById('keyed-img')
-const frameNum = document.getElementById('frame-num')
 
+// Playback elements
+const frameNum = document.getElementById('frame-num')
 const startBtn = document.getElementById('start-btn')
 const prevFrameBtn = document.getElementById('prev-frame-btn')
 const playBtn = document.getElementById('play-btn')
 const nextFrameBtn = document.getElementById('next-frame-btn')
 const endBtn = document.getElementById('end-btn')
+
+// Keyer Elements
+const colorPicker = document.getElementById('color-picker')
+const thresholdSlider = document.getElementById('key-threshold')
 
 let viewerState = {
     originalProxyPath: "",
@@ -32,6 +40,28 @@ sequenceLoadBtn.addEventListener('click', async () => {
     }
 })
 
+colorPicker.addEventListener('input', async () => {
+    if (viewerState.frameLength > 0) {
+        const color = colorPicker.value
+        const r = parseInt(color.substr(1,2), 16)
+        const g = parseInt(color.substr(3,2), 16)
+        const b = parseInt(color.substr(5,2), 16)
+        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value)
+        viewerUpdate(updateData)
+    }
+})
+
+thresholdSlider.addEventListener('change', async () => {
+    if (viewerState.frameLength > 0) {
+        const color = colorPicker.value
+        const r = parseInt(color.substr(1,2), 16)
+        const g = parseInt(color.substr(3,2), 16)
+        const b = parseInt(color.substr(5,2), 16)
+        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value)
+        viewerUpdate(updateData)
+    }
+})
+
 function replaceFramePaddingWithFrame(path, frameNum) {
     const regex = /%\d\dd/
     const framePaddingIndex = path.search(regex)
@@ -45,13 +75,24 @@ function replaceFramePaddingWithFrame(path, frameNum) {
 }
 
 function viewerUpdate(updateData) {
-    viewerState.originalProxyPath = updateData.originalProxyPath
-    viewerState.keyedProxyPath = updateData.keyedProxyPath
-    viewerState.frameLength = updateData.frameLength
-    const origFrame = replaceFramePaddingWithFrame(viewerState.originalProxyPath, viewerState.currentFrame)
-    const keyedFrame = replaceFramePaddingWithFrame(viewerState.keyedProxyPath, viewerState.currentFrame)
-
-    origImg.src = origFrame
-    keyedImg.src = keyedFrame
-    frameNum.innerHTML = viewerState.currentFrame
+    const CurrentTime = new Date()
+    if ("originalProxyPath" in updateData) {
+        viewerState.originalProxyPath = updateData.originalProxyPath
+        let origFrame = replaceFramePaddingWithFrame(viewerState.originalProxyPath, viewerState.currentFrame)
+        origFrame += '?'
+        origFrame += CurrentTime.getTime()
+        origImg.src = origFrame
+    }
+    if ("keyedProxyPath" in updateData) {
+        viewerState.keyedProxyPath = updateData.keyedProxyPath
+        let keyedFrame = replaceFramePaddingWithFrame(viewerState.keyedProxyPath, viewerState.currentFrame)
+        keyedFrame += '?'
+        keyedFrame += CurrentTime.getTime()
+        keyedImg.src = keyedFrame
+    }
+    if ("currentFrame" in updateData) {
+        viewerState.currentFrame = updateData.currentFrame
+        frameNum.innerHTML = viewerState.currentFrame
+    }
+    if ("frameLength" in updateData) viewerState.frameLength = updateData.frameLength
 }
