@@ -62,6 +62,50 @@ thresholdSlider.addEventListener('change', async () => {
     }
 })
 
+prevFrameBtn.addEventListener('click', () => {
+    if (viewerState.frameLength > 0 && viewerState.currentFrame > 1) {
+        let updateData = {
+            originalProxyPath: viewerState.originalProxyPath,
+            keyedProxyPath: viewerState.keyedProxyPath,
+            currentFrame: viewerState.currentFrame - 1
+        }
+        viewerUpdate(updateData)
+    }
+})
+
+nextFrameBtn.addEventListener('click', () => {
+    if (viewerState.frameLength > 0 && viewerState.currentFrame < viewerState.frameLength) {
+        let updateData = {
+            originalProxyPath: viewerState.originalProxyPath,
+            keyedProxyPath: viewerState.keyedProxyPath,
+            currentFrame: viewerState.currentFrame + 1
+        }
+        viewerUpdate(updateData)
+    }
+})
+
+startBtn.addEventListener('click', () => {
+    if (viewerState.frameLength > 0 && viewerState.currentFrame !== 1) {
+        let updateData = {
+            originalProxyPath: viewerState.originalProxyPath,
+            keyedProxyPath: viewerState.keyedProxyPath,
+            currentFrame: 1
+        }
+        viewerUpdate(updateData)
+    }
+})
+
+endBtn.addEventListener('click', () => {
+    if (viewerState.frameLength > 0 && viewerState.currentFrame < viewerState.frameLength) {
+        let updateData = {
+            originalProxyPath: viewerState.originalProxyPath,
+            keyedProxyPath: viewerState.keyedProxyPath,
+            currentFrame: viewerState.frameLength
+        }
+        viewerUpdate(updateData)
+    }
+})
+
 function replaceFramePaddingWithFrame(path, frameNum) {
     const regex = /%\d\dd/
     const framePaddingIndex = path.search(regex)
@@ -76,6 +120,10 @@ function replaceFramePaddingWithFrame(path, frameNum) {
 
 function viewerUpdate(updateData) {
     const CurrentTime = new Date()
+    if ("currentFrame" in updateData) {
+        viewerState.currentFrame = updateData.currentFrame
+        frameNum.innerHTML = viewerState.currentFrame
+    }
     if ("originalProxyPath" in updateData) {
         viewerState.originalProxyPath = updateData.originalProxyPath
         let origFrame = replaceFramePaddingWithFrame(viewerState.originalProxyPath, viewerState.currentFrame)
@@ -89,10 +137,6 @@ function viewerUpdate(updateData) {
         keyedFrame += '?'
         keyedFrame += CurrentTime.getTime()
         keyedImg.src = keyedFrame
-    }
-    if ("currentFrame" in updateData) {
-        viewerState.currentFrame = updateData.currentFrame
-        frameNum.innerHTML = viewerState.currentFrame
     }
     if ("frameLength" in updateData) viewerState.frameLength = updateData.frameLength
 }

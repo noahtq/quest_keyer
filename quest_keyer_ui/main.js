@@ -33,6 +33,7 @@ async function handleOpenSequence(event, sequencePath) {
         status: data.result,
         originalProxyPath: data["orig-proxy-path"],
         keyedProxyPath: data["keyer-proxy-path"],
+        currentFrame: 1,
         frameLength: data["frame-count"]
       }
 
@@ -55,7 +56,7 @@ async function handleChromaKey(event, red, green, blue, threshold) {
     const data = await response.json()
     if (data.result === 'ok') {
       console.log("Successfully keyed image sequence")
-      
+
       let updateData = {
         status: data.result,
         keyedProxyPath: data["keyer-proxy-path"],
