@@ -196,7 +196,7 @@ void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const Htt
         ret["result"] = "fail";
         ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255";
     }
-    
+
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }

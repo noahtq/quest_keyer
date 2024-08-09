@@ -47,6 +47,24 @@ async function handleOpenSequence(event, sequencePath) {
   }
 }
 
+async function handleExportSequence(event, export_path, red, green, blue, threshold) {
+  sequenceModified = export_path.replace("%", "%25")
+  const url = `http://localhost:5555/questkeyerapi/keyerapi/export?path=${sequenceModified}&keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}`
+  try {
+    const response = await fetch(url)
+
+    const data = await response.json()
+    if (data.result === 'ok') {
+      console.log("Succesfully keyed image")
+    } else {
+      console.log("An error occured while while exporting image sequence: " + data.result)
+    }
+    console.log("Message: " + data.message)
+  } catch (error) {
+    console.error(error.message)
+  }
+}
+
 async function handleChromaKey(event, red, green, blue, threshold) {
 
   const url = `http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}`
@@ -83,6 +101,7 @@ function createWindow () {
 app.whenReady().then(() => {
   ipcMain.handle('dialog:searchFile', handleFileSearch)
   ipcMain.handle('keyer:openSequence', handleOpenSequence)
+  ipcMain.handle('keyer:exportSequence', handleExportSequence)
   ipcMain.handle('keyer:chromaKey', handleChromaKey)
   createWindow()
 

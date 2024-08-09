@@ -6,6 +6,7 @@ const outputSearchBtn = document.getElementById('search-output-btn')
 const filePathElement = document.getElementById('input-path')
 const outputPathElement = document.getElementById('output-path')
 const sequenceLoadBtn = document.getElementById('load-input-btn')
+const sequenceExportBtn = document.getElementById('export-btn')
 
 // Viewer elements
 const origImg = document.getElementById('original-img')
@@ -46,6 +47,16 @@ sequenceLoadBtn.addEventListener('click', async () => {
         if (updateData.status === 'ok') {
             viewerUpdate(updateData)
         }
+    }
+})
+
+sequenceExportBtn.addEventListener('click', async () => {
+    if (viewerState.frameLength > 0 && outputPathElement.value.length > 0) {
+        const color = colorPicker.value
+        const r = parseInt(color.substr(1,2), 16)
+        const g = parseInt(color.substr(3,2), 16)
+        const b = parseInt(color.substr(5,2), 16)
+        await window.electronAPI.exportSequence(outputPathElement.value, r, g, b, thresholdSlider.value)
     }
 })
 
