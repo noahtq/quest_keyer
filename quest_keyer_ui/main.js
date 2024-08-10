@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
+const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron/main')
 const path = require('node:path')
 
 async function handleFileSearch() {
@@ -89,8 +89,10 @@ async function handleChromaKey(event, red, green, blue, threshold) {
   }
 }
 
-function createWindow () {
+function createWindow (winWidth, winHeight) {
   const mainWindow = new BrowserWindow({
+    width: winWidth,
+    height: winHeight,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -103,13 +105,16 @@ app.whenReady().then(() => {
   ipcMain.handle('keyer:openSequence', handleOpenSequence)
   ipcMain.handle('keyer:exportSequence', handleExportSequence)
   ipcMain.handle('keyer:chromaKey', handleChromaKey)
-  createWindow()
+  const primaryDisplay = screen.getPrimaryDisplay()
+  width = primaryDisplay.workAreaSize.width
+  height = primaryDisplay.workAreaSize.height
+  createWindow(width, height)
 
   backendInit()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+      createWindow(width, height)
     }
   })
 })
