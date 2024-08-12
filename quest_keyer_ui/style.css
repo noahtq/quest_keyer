@@ -1,0 +1,99 @@
+body {
+    max-height: 95vh;
+    overflow-y: hidden;
+}
+
+header {
+    text-align: center;
+    max-height: 5vh;
+}
+
+main {
+    display: grid;
+    gap: 1em;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+    "viewer"
+    "adjustments";
+    width: 100%;
+    max-height: 85vh;
+    padding: 0% 2%;
+}
+
+footer {
+    max-height: 5vh;
+    text-align: center;
+    margin: 2em;
+}
+
+footer > * {
+    display: inline-block;
+    padding-left: 1em;
+}
+
+#top {
+    grid-area: viewer;
+    max-height: 45vh;
+    margin: 1em;
+    margin-bottom: 1em;
+}
+
+.viewer-image {
+    height: 40vh;
+    object-fit: contain;
+}
+
+#playback {
+    max-height: 5vh;
+}
+
+#frame-num {
+
+}
+
+#bottom {
+    grid-area: adjustments;
+    display: grid;
+    grid-auto-rows: 1fr;
+    grid-template-columns: 2fr 3fr;
+    max-height: 40vh;
+}
+
+#io #keyer {
+    display: inline-block;
+    justify-content: center;
+}
+
+#keyer {
+    padding-left: 10%;
+}
+
+.key-param {
+    padding: 1em 0;
+}
+
+#image-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#image-display > img {
+    justify-self: center;
+    width: 100%;
+}
+
+#playback {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+}
+
+.quest-alert {
+    position: absolute;
+    top: 90%;
+    left: 3%;
+    opacity: 0%;
+    transition: 0.5s;
+}

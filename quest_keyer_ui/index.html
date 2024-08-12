@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta name="viewport">
+    <link rel="stylesheet" href="./modules/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Quest Keyer</title>
+  </head>
+  <body>
+    <header>
+      <h1 class="title-bar">Quest Keyer</h1>
+    </header>
+    <main>
+        <div id="top">
+          <div id="viewer">
+            <div id="image-display">
+              <img class="viewer-image" id="original-img" src="media/default_viewer_image.png" alt="">
+              <img class="viewer-image" id="keyed-img" src="media/default_viewer_image.png" alt="">
+            </div>
+            <div id="playback">
+              <div id="frame-num">
+                <p>0</p>
+              </div>
+              <div id="playback-btns">
+                <button class="btn" id="start-btn">Start</button>
+                <button class="btn" id="prev-frame-btn">&lt</button>
+                <button class="btn" id="play-btn">Play</button>
+                <button class="btn" id="next-frame-btn">&gt</button>
+                <button class="btn" id="end-btn">End</button>
+              </div>
+            </div>
+          </div>
+          <hr>
+      </div>
+      <div id="bottom">
+        <div id="io">
+          <h2>Files</h2>
+          <div class="file-field">
+            <input class="form-control" type="text" name="In Plate Location" id="input-path">
+            <button class="btn" id="search-input-btn">Search On Computer</button>
+            <button class="btn" id="load-input-btn">Load</button>
+          </div>
+          <div class="file-field">
+            <input class="form-control" type="text" name="Output Location" id="output-path">
+            <button class="btn" id="search-output-btn">Search On Computer</button>
+            <button class="btn" id="export-btn">Export</button>
+          </div>
+          <small class="form-text text-muted">File paths should include a valid image extension [.png, .jpg, .exr, ...] and a frame padding specifier [%04d - where the two digits (04) is the amount of frame padding added (so 04d would start the image sequence at 0001)].</small>
+        </div>
+        <div id="keyer">
+          <h2>Keying Parameters</h2>
+          <div class="scalar key-param">
+            <input type="color" name="Key Color Picker" id="color-picker">
+            <label for="Key Color Picker">Key Value/Color Picker</label>
+          </div>
+          <div class="key-param">
+            <input class="form-range" type="range" min="1" max="255" value="20" name="Threshold Slider" id="key-threshold">
+            <label for="Threshold Slider">Range</label>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>Developed by Noah Turnquist</p>
+      <a class="link-secondary" href="about.html">About</a>
+    </footer>
+    <script src='./renderer.js'></script>
+  </body>
+</html>
