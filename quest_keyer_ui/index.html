@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html data-bs-theme="dark">
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta name="viewport">
     <link rel="stylesheet" href="style.css">
     <title>Quest Keyer</title>
   </head>
@@ -12,14 +13,12 @@
       <h1 class="title-bar">Quest Keyer</h1>
     </header>
     <main>
-        <div id="content-area">
         <div id="top">
           <div id="viewer">
             <div id="image-display">
-              <img id="original-img" src="media/default_viewer_image.png" alt="">
-              <img id="keyed-img" src="media/default_viewer_image.png" alt="">
+              <img class="viewer-image" id="original-img" src="media/default_viewer_image.png" alt="">
+              <img class="viewer-image" id="keyed-img" src="media/default_viewer_image.png" alt="">
             </div>
-
             <div id="playback">
               <div id="frame-num">
                 <p>0</p>
@@ -52,13 +51,14 @@
           <h2>Keying Parameters</h2>
           <div class="scalar">
             <input type="color" name="Key Color Picker" id="color-picker">
+            <label for="Key Color Picker">Key Value/Color Picker</label>
           </div>
           <div>
-            <input type="range" min="1" max="255" value="50" name="Threshold Slider" id="key-threshold">
+            <input type="range" min="1" max="255" value="20" name="Threshold Slider" id="key-threshold">
+            <label for="Threshold Slider">Range</label>
           </div>
         </div>
       </div>
-    </div>
     </main>
     <footer>
       <p>Developed by Noah Turnquist</p>

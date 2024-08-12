@@ -1,4 +1,4 @@
-/* @font-face {
+@font-face {
     font-family: roboto-condensed;
     src: url(./fonts/roboto-condensed/RobotoCondensed-Regular.ttf);
     font-weight: 400;
@@ -162,4 +162,4 @@ a {
     justify-content: center;
     flex-flow: column;
 }
- */
+

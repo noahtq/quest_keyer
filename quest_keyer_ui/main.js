@@ -109,12 +109,12 @@ app.whenReady().then(() => {
   width = primaryDisplay.workAreaSize.width
   height = primaryDisplay.workAreaSize.height
   createWindow(width, height)
-
   backendInit()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow(width, height)
+      backendInit()
     }
   })
 })
