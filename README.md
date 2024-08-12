@@ -12,7 +12,12 @@ A better chroma keyer for commercial VFX workflows
 - Electron (Javascript, HTML, CSS)
 - Bootstrap for Styling
 
-## Versions (Current 0.0.0)
+## Versions (Current 0.0.1)
+### 0.0.1
+- Implemented core functionality for both frontend and backend
+- Quest Keyer very simple keying functionality
+- Quest API end points for initializing backend, opening image sequence, exporting image sequence, keying image sequence.
+- Simple, stylish frontend with Bootstrap
 
 ## Communication Between Frontend and Backend
 The Electron frontend client communicates with the Drogon backend server over a local websocket. The server returns JSON objects in the form of  
