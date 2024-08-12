@@ -26,22 +26,22 @@ async function handleOpenSequence(event, sequencePath) {
     const response = await fetch(url)
 
     const data = await response.json()
+    let updateData = {
+      status: data.result,
+      message: data.message
+    }
     if (data.result === 'ok') {
       console.log("Server received image")
 
-      let updateData = {
-        status: data.result,
-        originalProxyPath: data["orig-proxy-path"],
-        keyedProxyPath: data["keyer-proxy-path"],
-        currentFrame: 1,
-        frameLength: data["frame-count"]
-      }
-
-      return updateData;
+      updateData["originalProxyPath"] = data["orig-proxy-path"]
+      updateData["keyedProxyPath"] = data["keyer-proxy-path"]
+      updateData["currentFrame"] = 1
+      updateData["frameLength"] = data["frame-count"]
     } else {
       console.log("An error occured while while sending to backend: " + data.result)
     }
     console.log("Message: " + data.message)
+    return updateData
   } catch (error) {
     console.error(error.message)
   }
@@ -59,7 +59,12 @@ async function handleExportSequence(event, export_path, red, green, blue, thresh
     } else {
       console.log("An error occured while while exporting image sequence: " + data.result)
     }
+    let updateData = {
+      status: data.result,
+      message: data.message
+    }
     console.log("Message: " + data.message)
+    return updateData
   } catch (error) {
     console.error(error.message)
   }

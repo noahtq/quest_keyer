@@ -1,4 +1,6 @@
 const playbackFPS = 30
+const alertPopupDuration = 5000
+const alertFadeDuration = 500
 
 // IO elements
 const inputSearchBtn = document.getElementById('search-input-btn')
@@ -29,7 +31,7 @@ let viewerState = {
     keyedProxyPath: "",
     currentFrame: 1,
     frameLength: -1
-  }
+}
 
 inputSearchBtn.addEventListener('click', async () => {
     const filePath = await window.electronAPI.searchFile()
@@ -43,7 +45,9 @@ outputSearchBtn.addEventListener('click', async () => {
 
 sequenceLoadBtn.addEventListener('click', async () => {
     if (filePathElement.value.length > 0) {
+        createAlert("", "Opening Image Sequence")
         const updateData = await window.electronAPI.openSequence(filePathElement.value)
+        createAlert(updateData.status, updateData.message)
         if (updateData.status === 'ok') {
             viewerUpdate(updateData)
         }
@@ -52,11 +56,13 @@ sequenceLoadBtn.addEventListener('click', async () => {
 
 sequenceExportBtn.addEventListener('click', async () => {
     if (viewerState.frameLength > 0 && outputPathElement.value.length > 0) {
+        createAlert("", "Exporting Image Sequence")
         const color = colorPicker.value
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        await window.electronAPI.exportSequence(outputPathElement.value, r, g, b, thresholdSlider.value)
+        const updateData = await window.electronAPI.exportSequence(outputPathElement.value, r, g, b, thresholdSlider.value)
+        createAlert(updateData.status, updateData.message)
     }
 })
 
@@ -181,4 +187,29 @@ function viewerUpdate(updateData) {
         keyedImg.src = keyedFrame
     }
     if ("frameLength" in updateData) viewerState.frameLength = updateData.frameLength
+}
+
+async function createAlert(type, message) {
+    let newAlert = document.createElement("div")
+    newAlert.classList.add("alert")
+    newAlert.classList.add("quest-alert")
+    if (type === "ok") {
+        newAlert.classList.add("alert-success")
+    } else if (type === "fail") {
+        newAlert.classList.add("alert-danger")
+    } else {
+        newAlert.classList.add("alert-primary")
+    }
+    newAlert.innerHTML = message
+    document.body.appendChild(newAlert)
+    requestAnimationFrame(function() {
+        newAlert.style.opacity = "100%"
+    })
+    await delay(alertFadeDuration)
+    await delay(alertPopupDuration)
+    requestAnimationFrame(function() {
+        newAlert.style.opacity = "0%"
+    })
+    await delay(alertFadeDuration)
+    newAlert.remove()
 }
