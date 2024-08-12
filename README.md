@@ -1,6 +1,17 @@
 # Quest Keyer
 A better chroma keyer for commercial VFX workflows
 
+## Tech Stack
+### Backend
+- C++ & CMake
+- Propriatary Quest Image Sequence Library for Image Sequence Functionality
+- OpenCV for Computer Vision and Image Manipulation
+- Drogon to create REST API
+
+### Frontend
+- Electron (Javascript, HTML, CSS)
+- Bootstrap for Styling
+
 ## Versions (Current 0.0.0)
 
 ## Communication Between Frontend and Backend
