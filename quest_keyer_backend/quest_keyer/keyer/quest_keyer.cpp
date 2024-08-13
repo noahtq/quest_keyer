@@ -23,3 +23,10 @@ void Quest::ChromaKey(const ImageSeq& original_seq, ImageSeq& destination_seq, c
         destination_seq[i] = frame;
     }
 }
+
+void Quest::Despill(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value) {
+    for (int i = 0; i < original_seq.get_frame_count(); i++) {
+        GaussianBlur(original_seq.get_frame(i), destination_seq.get_frame(i), cv::Size(55, 55), 0, 0, cv::BORDER_CONSTANT);
+    }
+}
+

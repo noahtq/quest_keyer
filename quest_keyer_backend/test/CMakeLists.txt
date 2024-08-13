@@ -6,7 +6,7 @@ add_executable(${PROJECT_NAME} test_main.cc
         ../quest_keyer/keyer/quest_keyer.h
         ../quest_keyer/keyer/quest_keyer.h
         ../include/json.hpp
-        ../quest_keyer/include/quest_seq_lib.cpp
+        ../quest_keyer/include/quest_seq_lib.h
 )
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
