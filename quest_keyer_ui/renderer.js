@@ -95,8 +95,12 @@ despillCheckbox.addEventListener('click', async () => {
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
-        viewerUpdate(updateData)
+        if (r > 0 || g > 0 || b > 0) {
+            const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
+            viewerUpdate(updateData)
+        } else {
+            despillCheckbox.checked = false
+        }
     }
 })
 
