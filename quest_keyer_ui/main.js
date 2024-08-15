@@ -47,9 +47,9 @@ async function handleOpenSequence(event, sequencePath) {
   }
 }
 
-async function handleExportSequence(event, export_path, red, green, blue, threshold) {
+async function handleExportSequence(event, export_path, red, green, blue, threshold, applyDespill) {
   sequenceModified = export_path.replace("%", "%25")
-  const url = `http://localhost:5555/questkeyerapi/keyerapi/export?path=${sequenceModified}&keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}`
+  const url = `http://localhost:5555/questkeyerapi/keyerapi/export?path=${sequenceModified}&keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}&despill=${applyDespill}`
   try {
     const response = await fetch(url)
 
@@ -70,9 +70,8 @@ async function handleExportSequence(event, export_path, red, green, blue, thresh
   }
 }
 
-async function handleChromaKey(event, red, green, blue, threshold) {
-
-  const url = `http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}`
+async function handleChromaKey(event, red, green, blue, threshold, applyDespill) {
+  const url = `http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}&despill=${applyDespill}`
   try {
     const response = await fetch(url)
 

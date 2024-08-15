@@ -13,7 +13,6 @@ void KeyerConfig::populate(const std::filesystem::path& config_path) {
     proxy_size = config_params.at("proxy-size");
 }
 
-
 void KeyerAPI::Init(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback) {
     LOG_DEBUG << "Initializing Program";
 
@@ -125,18 +124,24 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
 
 
 void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
-    const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold) const{
+    const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold,
+    const std::string &despill) const{
     LOG_DEBUG << "Received Key Parameters from Client";
     assert(keyer_seq.get_frame_count() > 0);
 
     Json::Value ret;
-    if (VerifyKeyValues(key_r, key_g, key_b, threshold)) {
+    if (VerifyKeyValues(key_r, key_g, key_b, threshold, despill)) {
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
         const int b_val = std::stoi(key_b);
         const int threshold_val = std::stoi(threshold);
+        const bool apply_despill = despill == "true";
 
         Quest::ChromaKey(*orig_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        if (apply_despill) {
+            LOG_DEBUG << "Despilling image";
+            Quest::Despill(*keyer_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val));
+        }
         keyer_proxy->render(keyer_proxy->get_output_path());
 
         LOG_DEBUG << "Successfully keyed image";
@@ -145,7 +150,8 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
         ret["keyer-proxy-path"] = (std::filesystem::canonical(keyer_proxy->get_output_path().parent_path()) / keyer_proxy->get_output_path().filename()).string();
     } else {
         ret["result"] = "fail";
-        ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255";
+        ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255. "
+                         "Despill value must be boolean value.";
     }
 
     auto resp = HttpResponse::newHttpJsonResponse(ret);
@@ -154,19 +160,24 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
 
 void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const HttpResponsePtr&)>&& callback,
     const std::string& output_path,
-    const std::string& key_r, const std::string& key_g, const std::string& key_b, const std::string& threshold) {
+    const std::string& key_r, const std::string& key_g, const std::string& key_b, const std::string& threshold,
+    const std::string &despill) {
     LOG_DEBUG << "Exporting image sequence";
     assert(keyer_seq.get_frame_count() > 0);
 
     Json::Value ret;
-    if (VerifyKeyValues(key_r, key_g, key_b, threshold)) {
+    if (VerifyKeyValues(key_r, key_g, key_b, threshold, despill)) {
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
         const int b_val = std::stoi(key_b);
         const int threshold_val = std::stoi(threshold);
+        const bool apply_despill = despill == "true";
 
         Quest::ImageSeq export_seq = keyer_seq;
         Quest::ChromaKey(keyer_seq, export_seq, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        if (apply_despill) {
+            Quest::Despill(export_seq, export_seq, cv::Scalar(r_val, g_val, b_val));
+        }
 
         try {
             Quest::SeqErrorCodes code = export_seq.render(output_path);
@@ -194,14 +205,16 @@ void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const Htt
         }
     } else {
         ret["result"] = "fail";
-        ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255";
+        ret["message"] = "Invalid key parameters. Key parameters must be integers and be between 0 - 255. "
+                 "Despill value must be boolean value.";
     }
 
     auto resp = HttpResponse::newHttpJsonResponse(ret);
     callback(resp);
 }
 
-bool QuestKeyerAPI::VerifyKeyValues(const std::string& key_r, const std::string& key_g, const std::string& key_b, const std::string& threshold) {
+bool QuestKeyerAPI::VerifyKeyValues(const std::string& key_r, const std::string& key_g, const std::string& key_b,
+    const std::string& threshold, const std::string& despill) {
     try {
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
@@ -211,7 +224,8 @@ bool QuestKeyerAPI::VerifyKeyValues(const std::string& key_r, const std::string&
         if ((r_val >= 0 && r_val <= 255) &&
             (g_val >= 0 && g_val <= 255) &&
             (b_val >= 0 && b_val <= 255) &&
-            (threshold_val >= 0 && threshold_val <= 255)) {
+            (threshold_val >= 0 && threshold_val <= 255) &&
+            (despill == "true" || despill == "false")) {
             return true;
         } return false;
     } catch (std::invalid_argument& e) {

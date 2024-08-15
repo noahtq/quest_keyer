@@ -25,6 +25,7 @@ const endBtn = document.getElementById('end-btn')
 // Keyer Elements
 const colorPicker = document.getElementById('color-picker')
 const thresholdSlider = document.getElementById('key-threshold')
+const despillCheckbox = document.getElementById('despill-checkbox')
 
 let viewerState = {
     originalProxyPath: "",
@@ -61,7 +62,7 @@ sequenceExportBtn.addEventListener('click', async () => {
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        const updateData = await window.electronAPI.exportSequence(outputPathElement.value, r, g, b, thresholdSlider.value)
+        const updateData = await window.electronAPI.exportSequence(outputPathElement.value, r, g, b, thresholdSlider.value, despillCheckbox.checked)
         createAlert(updateData.status, updateData.message)
     }
 })
@@ -72,7 +73,7 @@ colorPicker.addEventListener('input', async () => {
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value)
+        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
         viewerUpdate(updateData)
     }
 })
@@ -83,8 +84,23 @@ thresholdSlider.addEventListener('change', async () => {
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value)
+        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
         viewerUpdate(updateData)
+    }
+})
+
+despillCheckbox.addEventListener('click', async () => {
+    if (viewerState.frameLength > 0) {
+        const color = colorPicker.value
+        const r = parseInt(color.substr(1,2), 16)
+        const g = parseInt(color.substr(3,2), 16)
+        const b = parseInt(color.substr(5,2), 16)
+        if (r > 0 || g > 0 || b > 0) {
+            const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
+            viewerUpdate(updateData)
+        } else {
+            despillCheckbox.checked = false
+        }
     }
 })
 
