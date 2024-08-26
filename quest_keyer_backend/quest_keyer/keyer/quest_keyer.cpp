@@ -4,37 +4,35 @@
 
 #include "quest_keyer.h"
 
-void Quest::ChromaKey(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const double& threshold) {
+void Quest::UltimatteKeyer(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const double& threshold) {
     // TODO: Make this color agnostic
+    // TODO: Make it so that frames are being exported with an alpha channel
 
     const int key_channel = 1; // Green
     const int other_channel = 0; // Blue
 
-    cv::Size frame_size = cv::Size(original_seq.get_frame(0).cols, original_seq.get_frame(0).rows);
-
     for (int i = 0; i < original_seq.get_frame_count(); i++) {
         // Define original and destination frames and convert to 32 bit float matrices
-        // with color values between 0 and 1
+        // with color values between 0 and 1.
         cv::Mat orig_frame = original_seq.get_frame(i);
         cv::Mat& dest_frame = destination_seq[i];
         orig_frame.convertTo(orig_frame, CV_32FC3, 1.0/255.0);
-        dest_frame.convertTo(dest_frame, CV_32FC3, 1.0/255.0);
+        dest_frame.convertTo(dest_frame, CV_32FC4, 1.0/255.0);
 
-        // A color plane that the foreground colors lie on
         const cv::Scalar background_color(key_value[0] / 255.0, key_value[1] / 255.0, key_value[2] / 255.0);
-        const cv::Scalar A(0, 1, -threshold, 0);
+        const cv::Scalar A(0, 1, -threshold, 0); // A color plane that the foreground colors lie on
         const double k1 = 1 / background_color.dot(A);
         cv::MatIterator_<cv::Vec3f> orig_it, orig_end;
         cv::MatIterator_<cv::Vec4f> dest_it;
         for (orig_it = orig_frame.begin<cv::Vec3f>(), dest_it = dest_frame.begin<cv::Vec4f>(),
             orig_end = orig_frame.end<cv::Vec3f>(); orig_it < orig_end; ++orig_it, ++dest_it) {
-            const float alpha_val = std::clamp(1 - k1 * ((*orig_it)[key_channel] - threshold * (*orig_it)[other_channel]), 0.0, 1.0);
+            (*dest_it)[3] = 1.0;
+            const float alpha_val = static_cast<float>(std::clamp(1 - k1 * ((*orig_it)[key_channel] - threshold * (*orig_it)[other_channel]), 0.0, 1.0));
             for (int c = 0; c < 3; c++) {
                 (*dest_it)[c] = (*orig_it)[c] * alpha_val;
             }
             }
-        orig_frame.convertTo(orig_frame, CV_8U, 255);
-        dest_frame.convertTo(dest_frame, CV_8U, 255);
+        dest_frame.convertTo(dest_frame, CV_8UC4, 255);
     }
 }
 
