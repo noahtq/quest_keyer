@@ -6,7 +6,6 @@
 
 void Quest::UltimatteKeyer(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const double& threshold) {
     // TODO: Make this color agnostic
-    // TODO: Make it so that frames are being exported with an alpha channel
 
     const int key_channel = 1; // Green
     const int other_channel = 0; // Blue
@@ -26,9 +25,9 @@ void Quest::UltimatteKeyer(const ImageSeq& original_seq, ImageSeq& destination_s
         cv::MatIterator_<cv::Vec4f> dest_it;
         for (orig_it = orig_frame.begin<cv::Vec3f>(), dest_it = dest_frame.begin<cv::Vec4f>(),
             orig_end = orig_frame.end<cv::Vec3f>(); orig_it < orig_end; ++orig_it, ++dest_it) {
-            (*dest_it)[3] = 1.0;
+            (*dest_it)[3] = 1.0; // Set alpha value to pure white just in case
             const float alpha_val = static_cast<float>(std::clamp(1 - k1 * ((*orig_it)[key_channel] - threshold * (*orig_it)[other_channel]), 0.0, 1.0));
-            for (int c = 0; c < 3; c++) {
+            for (int c = 0; c < 4; c++) {
                 (*dest_it)[c] = (*orig_it)[c] * alpha_val;
             }
             }

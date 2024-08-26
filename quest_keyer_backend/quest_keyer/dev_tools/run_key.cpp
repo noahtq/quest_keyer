@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
         cv::Mat channels[4];
         cv::split(image_seq[0], channels);
-        
+
         cv::imshow("Original", original);
         cv::waitKey(0);
 
