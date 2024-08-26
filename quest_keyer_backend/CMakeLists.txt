@@ -32,7 +32,7 @@ add_executable(${PROJECT_NAME} main.cc
 #        quest_keyer/include/quest_seq_lib.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/quest_keyer/lib/libquest_image_seq_0.0.2.a)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/quest_keyer/lib/libquest_image_seq_0.0.3.a)
 
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method

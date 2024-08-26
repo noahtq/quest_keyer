@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         cv::Scalar* key_vals;
-        int* threshold;
+        double* threshold;
         try {
             key_vals = new cv::Scalar(stod(argv[2]), stod(argv[3]), stod(argv[4]));
         } catch (...) {
@@ -32,12 +32,32 @@ int main(int argc, char** argv) {
             return 2;
         }
         try {
-            threshold = new int(stoi(argv[5]));
+            threshold = new double(stod(argv[5]));
         } catch (...) {
             cerr << "Something went wrong converting threshold to int";
             return 2;
         }
-        ChromaKey(image_seq, image_seq, *key_vals, *threshold);
+
+        cout << "Keying image\n";
+
+        cv::Mat original;
+        image_seq.get_frame(0).copyTo(original);
+
+        UltimatteKeyer(image_seq, image_seq, *key_vals, *threshold);
+        Despill(image_seq, image_seq, *key_vals);
+
+        cv::Mat channels[4];
+        cv::split(image_seq[0], channels);
+        
+        cv::imshow("Original", original);
+        cv::waitKey(0);
+
+        cv::imshow("Key Result", image_seq[0]);
+        cv::waitKey(0);
+
+        cv::imshow("Alpha", channels[3]);
+        cv::waitKey(0);
+
         delete key_vals;
         delete threshold;
 
