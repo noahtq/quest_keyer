@@ -134,13 +134,13 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
         const int b_val = std::stoi(key_b);
-        const int threshold_val = std::stoi(threshold);
+        const double threshold_val = std::stod(threshold);
         const bool apply_despill = despill == "true";
 
-        Quest::ChromaKey(*orig_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        Quest::UltimatteKeyer(*orig_proxy, *keyer_proxy, cv::Scalar(b_val, g_val, r_val), threshold_val);
         if (apply_despill) {
             LOG_DEBUG << "Despilling image";
-            Quest::Despill(*keyer_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val));
+            Quest::Despill(*keyer_proxy, *keyer_proxy, cv::Scalar(b_val, g_val, r_val));
         }
         keyer_proxy->render(keyer_proxy->get_output_path());
 
@@ -170,13 +170,13 @@ void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const Htt
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
         const int b_val = std::stoi(key_b);
-        const int threshold_val = std::stoi(threshold);
+        const double threshold_val = std::stod(threshold);
         const bool apply_despill = despill == "true";
 
         Quest::ImageSeq export_seq = keyer_seq;
-        Quest::ChromaKey(keyer_seq, export_seq, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        Quest::UltimatteKeyer(keyer_seq, export_seq, cv::Scalar(b_val, g_val, r_val), threshold_val);
         if (apply_despill) {
-            Quest::Despill(export_seq, export_seq, cv::Scalar(r_val, g_val, b_val));
+            Quest::Despill(export_seq, export_seq, cv::Scalar(b_val, g_val, r_val));
         }
 
         try {
@@ -224,7 +224,7 @@ bool QuestKeyerAPI::VerifyKeyValues(const std::string& key_r, const std::string&
         if ((r_val >= 0 && r_val <= 255) &&
             (g_val >= 0 && g_val <= 255) &&
             (b_val >= 0 && b_val <= 255) &&
-            (threshold_val >= 0 && threshold_val <= 255) &&
+            (threshold_val >= 0.0 && threshold_val <= 1.0) &&
             (despill == "true" || despill == "false")) {
             return true;
         } return false;

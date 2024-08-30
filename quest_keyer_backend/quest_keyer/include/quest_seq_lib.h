@@ -7,8 +7,8 @@
 namespace Quest {
     inline const std::vector<std::string> supported_image_extensions = {
         ".png", ".jpg", ".jpeg", ".jpe", ".bmp", ".dib", ".jp2",
-        ".webp", ".ppm", ".pnm", ".sr", ".ras",
-        ".tiff", ".tif", ".hdr", ".pic"
+        ".webp", ".sr", ".ras",
+        ".tiff", ".tif"
     };
 
     enum class SeqErrorCodes {Success = 0, BadPath, UnsupportedExtension};
@@ -94,6 +94,9 @@ namespace Quest {
     // Equality Operators
     bool operator==(const ImageSeq& seq_1, const ImageSeq& seq_2);
     inline bool operator!=(const ImageSeq& seq_1, const ImageSeq& seq_2) { return !(seq_1 == seq_2); }
+
+    // Helper functions
+    void GiveMatPureWhiteAlpha(cv::Mat& image);
 }
 
 #endif //QUEST_IMAGE_SEQ_LIB_LIBRARY_H
