@@ -137,10 +137,10 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
         const double threshold_val = std::stod(threshold);
         const bool apply_despill = despill == "true";
 
-        Quest::UltimatteKeyer(*orig_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        Quest::UltimatteKeyer(*orig_proxy, *keyer_proxy, cv::Scalar(b_val, g_val, r_val), threshold_val);
         if (apply_despill) {
             LOG_DEBUG << "Despilling image";
-            Quest::Despill(*keyer_proxy, *keyer_proxy, cv::Scalar(r_val, g_val, b_val));
+            Quest::Despill(*keyer_proxy, *keyer_proxy, cv::Scalar(b_val, g_val, r_val));
         }
         keyer_proxy->render(keyer_proxy->get_output_path());
 
@@ -174,9 +174,9 @@ void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const Htt
         const bool apply_despill = despill == "true";
 
         Quest::ImageSeq export_seq = keyer_seq;
-        Quest::UltimatteKeyer(keyer_seq, export_seq, cv::Scalar(r_val, g_val, b_val), threshold_val);
+        Quest::UltimatteKeyer(keyer_seq, export_seq, cv::Scalar(b_val, g_val, r_val), threshold_val);
         if (apply_despill) {
-            Quest::Despill(export_seq, export_seq, cv::Scalar(r_val, g_val, b_val));
+            Quest::Despill(export_seq, export_seq, cv::Scalar(b_val, g_val, r_val));
         }
 
         try {

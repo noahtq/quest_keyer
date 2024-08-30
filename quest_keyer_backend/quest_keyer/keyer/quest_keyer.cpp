@@ -5,10 +5,29 @@
 #include "quest_keyer.h"
 
 void Quest::UltimatteKeyer(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value, const double& threshold) {
-    // TODO: Make this color agnostic
+    int key_channel = 0;
+    int max_val = static_cast<int>(key_value[0]);
+    for (int i = 1; i < 3; i++) {
+        if (key_value[i] > max_val) {
+            key_channel = i;
+            max_val = static_cast<int>(key_value[i]);
+        }
+    }
 
-    const int key_channel = 1; // Green
-    const int other_channel = 0; // Blue
+    int other_channel;
+    switch (key_channel) {
+    case 0: // Blue
+        other_channel = 1; // Green
+        break;
+    case 1: // Green
+        other_channel = 0; // Blue
+        break;
+    case 2: // Red
+        other_channel = 1; // Green
+        break;
+    default:
+        throw std::out_of_range("Something went wrong. While selecting the most prominent key value");
+    }
 
     for (int i = 0; i < original_seq.get_frame_count(); i++) {
         // Define original and destination frames and convert to 32 bit float matrices
@@ -39,14 +58,14 @@ void Quest::Despill(const ImageSeq& original_seq, ImageSeq& destination_seq, con
     assert(key_value[0] > 0 || key_value[1] > 0 || key_value[2] > 0);
     int despill_channel = 0;
     int max_val = static_cast<int>(key_value[0]);
-    for (int i = 1; i < 2; i++) {
+    for (int i = 1; i < 3; i++) {
         if (key_value[i] > max_val) {
             despill_channel = i;
             max_val = static_cast<int>(key_value[i]);
         }
     }
 
-    const int other_channel_1 = (despill_channel - 1) % 3;
+    const int other_channel_1 = despill_channel - 1 > 0 ? (despill_channel - 1) % 3 : 2; // Have to do this one kind of weird because of the way C++ does modulo on negative numbers
     const int other_channel_2 = (despill_channel + 1) % 3;
     for (int i = 0; i < original_seq.get_frame_count(); i++) {
         cv::MatIterator_<cv::Vec3b> orig_it, orig_end, dest_it;
