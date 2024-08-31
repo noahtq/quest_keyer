@@ -1,10 +1,24 @@
 #define DROGON_TEST_MAIN
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
+// #include "../controllers/QuestKeyerAPI_KeyerAPI.h" //TODO: can remove this
 
-DROGON_TEST(BasicTest)
-{
-    // Add your tests here
+using namespace drogon;
+
+DROGON_TEST(InitEndPoint) {
+    // TODO: issue could be that relative paths (such as include statements) in the files we are utilizing (like the files in controllers)
+    // TODO: are pathed relative to the base CMake Dir and now that we're running them relative to the test directory the file paths are no longer correct
+    // QuestKeyerAPI::KeyerConfig config; //TODO: can remove this
+    auto client = HttpClient::newHttpClient("http://localhost:8848");
+    auto req = HttpRequest::newHttpRequest();
+    req->setPath("/questkeyerapi/keyerapi/init");
+    client->sendRequest(req, [TEST_CTX](ReqResult res, const HttpResponsePtr& resp) {
+        REQUIRE(res == ReqResult::Ok);
+        REQUIRE(resp != nullptr);
+
+        CHECK(resp->getStatusCode() == k200OK);
+        CHECK(resp->contentType() == CT_APPLICATION_JSON);
+    });
 }
 
 int main(int argc, char** argv) 

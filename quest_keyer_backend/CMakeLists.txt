@@ -29,7 +29,6 @@ add_executable(${PROJECT_NAME} main.cc
         quest_keyer/keyer/quest_keyer.cpp
         quest_keyer/keyer/quest_keyer.h
         include/json.hpp
-#        quest_keyer/include/quest_seq_lib.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/quest_keyer/lib/libquest_image_seq_0.0.3.a)
