@@ -35,12 +35,18 @@ let viewerState = {
 }
 
 inputSearchBtn.addEventListener('click', async () => {
-    const filePath = await window.electronAPI.searchFile()
+    let filePath = await window.electronAPI.searchFile()
+    if (isImagePath(filePath)) {
+        filePath = replaceFrameWithFramePadding(filePath)
+    }
     filePathElement.value = filePath
 })
 
 outputSearchBtn.addEventListener('click', async () => {
-    const filePath = await window.electronAPI.searchFile()
+    let filePath = await window.electronAPI.searchFile()
+    if (isImagePath(filePath)) {
+        filePath = replaceFrameWithFramePadding(filePath)
+    }
     outputPathElement.value = filePath
 })
 
@@ -180,6 +186,40 @@ function replaceFramePaddingWithFrame(path, frameNum) {
     }
     numberStr += Number(frameNum)
     return path.replace(regex, numberStr)
+}
+
+function replaceFrameWithFramePadding(path) {
+    // Extract file name from file path
+    const fileRegex = /\/[^\/]+/g
+    const fileMatchArray = path.match(fileRegex)
+    const fileName = fileMatchArray[fileMatchArray.length - 1]
+    const regex = /\d{2,}/g
+    const matchArray = fileName.match(regex)
+    if (!matchArray) {
+        return path
+    }
+    // Find last instance of 2 or more numbers in file name
+    const framePaddingSize = matchArray[matchArray.length - 1].length
+    let framePaddingStr = "%"
+    if (framePaddingSize < 10) {
+        framePaddingStr += "0"
+    }
+    framePaddingStr += String(framePaddingSize)
+    framePaddingStr += "d"
+    const newFileName = fileName.replace(matchArray[matchArray.length - 1], framePaddingStr)
+    return path.replace(fileName, newFileName)
+}
+
+function isImagePath(path) {
+    const imageExtensions = [".png", ".jpg", ".jpeg", ".jpe", ".bmp", ".dib", ".jp2", ".webp", ".sr", ".ras", ".tiff", ".tif"]
+    for (const extension of imageExtensions) {
+        const regex = new RegExp(extension)
+        const match = path.search(regex)
+        if (match > 0) {
+            return true
+        }
+    }
+    return false
 }
 
 function viewerUpdate(updateData) {
