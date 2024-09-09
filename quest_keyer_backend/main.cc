@@ -7,9 +7,12 @@ int main(int argc, char** argv) {
 
         std::stringstream ss;
         ss << "open ";
-        std::filesystem::path frontend_path = "../../quest_keyer_ui/out/quest_keyer_ui-darwin-arm64/quest_keyer_ui.app";
+        const std::filesystem::path frontend_path = "../../quest_keyer_ui/out/quest_keyer_ui-darwin-arm64/quest_keyer_ui.app";
         ss << std::filesystem::canonical(frontend_path);
-        system((ss.str()).c_str());
+        if (system((ss.str()).c_str()) != 0) {
+            std::cerr << "Couldn't open frontend application";
+            return 1;
+        }
     } else {
         std::cout << "Running in development mode\n";
     }
