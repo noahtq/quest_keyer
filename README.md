@@ -1,5 +1,7 @@
 # Quest Keyer
-A better chroma keyer for VFX workflows
+C++/computer vision portfolio project by Noah Turnquist.  
+Chromatic image and video keyer.  
+The chroma keying is done using Petro Vlahos' ultimatte keying technique.
 
 ## Tech Stack
 ### Backend
