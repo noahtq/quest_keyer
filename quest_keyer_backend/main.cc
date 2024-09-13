@@ -6,10 +6,11 @@ int main(int argc, char** argv) {
         std::cout << "Running in production mode\n";
 
         std::stringstream ss;
-        ss << "open ";
-        const std::filesystem::path frontend_path = "../../quest_keyer_ui/out/quest_keyer_ui-darwin-arm64/quest_keyer_ui.app";
+        ss << "cd ";
+        const std::filesystem::path frontend_path = "../../quest_keyer_ui";
         ss << std::filesystem::canonical(frontend_path);
-        if (system((ss.str()).c_str()) != 0) {
+        ss << " && npm start run &";
+        if (system((ss.str()).c_str())) {
             std::cerr << "Couldn't open frontend application";
             return 1;
         }
@@ -24,5 +25,6 @@ int main(int argc, char** argv) {
     //drogon::app().loadConfigFile("../config.yaml");
     //Run HTTP framework,the method will block in the internal event loop
     drogon::app().run();
+
     return 0;
 }
