@@ -27,7 +27,7 @@ const colorPicker = document.getElementById('color-picker')
 const thresholdSlider = document.getElementById('key-threshold')
 const despillCheckbox = document.getElementById('despill-checkbox')
 const keyBackgroundSelector = document.getElementById('key-background')
-const backgroundImages = populateBackgroundSelector()
+populateBackgroundSelector()
 
 let viewerState = {
     originalProxyPath: "",
@@ -86,15 +86,32 @@ sequenceExportBtn.addEventListener('click', async () => {
     }
 })
 
+async function getBackgroundPath() {
+    const backgroundImages = await window.electronAPI.loadBackgroundImages()
+    const backgroundID = keyBackgroundSelector.value
+    for (const image in backgroundImages) {
+        if (backgroundImages[image].id === Number(backgroundID)) {
+            return backgroundImages[image].path
+        }
+    }
+    return null
+}
+
 async function keyImage() {
     if (viewerState.frameLength > 0) {
         const color = colorPicker.value
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        const backgroundPath = null //Update this once fully functional
+        let backgroundPath = null;
+        if (keyBackgroundSelector.value != 'none') {
+            backgroundPath = await getBackgroundPath()
+            if (!backgroundPath) {
+                console.error("There was an error getting the background image path")
+            }
+        }
         if (r > 0 || g > 0 || b > 0) {
-            const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
+            const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked, backgroundPath)
             viewerUpdate(updateData)
         } else {
             despillCheckbox.checked = false
@@ -115,7 +132,6 @@ despillCheckbox.addEventListener('click', async () => {
 })
 
 keyBackgroundSelector.addEventListener('change', async () => {
-    console.log("Going")
     keyImage()
 })
 

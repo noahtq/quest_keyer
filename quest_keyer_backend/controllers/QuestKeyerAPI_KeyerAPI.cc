@@ -125,9 +125,11 @@ void KeyerAPI::OpenSeq(const HttpRequestPtr& req, std::function<void(const HttpR
 
 void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const HttpResponsePtr &)> &&callback,
     const std::string &key_r, const std::string &key_g, const std::string &key_b, const std::string &threshold,
-    const std::string &despill) const{
+    const std::string &despill, const std::string &background_path) const{
     LOG_DEBUG << "Received Key Parameters from Client";
     assert(keyer_seq.get_frame_count() > 0);
+
+    LOG_DEBUG << background_path;
 
     Json::Value ret;
     if (VerifyKeyValues(key_r, key_g, key_b, threshold, despill)) {
