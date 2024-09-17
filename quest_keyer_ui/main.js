@@ -1,5 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron/main')
 const path = require('node:path')
+const backgroundImages = require('./media/key_backgrounds/background_info.json')
+
+// Populate background selector when program starts
+async function getBackgroundImages() {
+  return backgroundImages
+}
 
 async function handleFileSearch() {
   const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -111,6 +117,7 @@ app.whenReady().then(() => {
   ipcMain.handle('keyer:openSequence', handleOpenSequence)
   ipcMain.handle('keyer:exportSequence', handleExportSequence)
   ipcMain.handle('keyer:chromaKey', handleChromaKey)
+  ipcMain.handle('config:loadBackgroundImages', getBackgroundImages)
   const primaryDisplay = screen.getPrimaryDisplay()
   width = primaryDisplay.workAreaSize.width
   height = primaryDisplay.workAreaSize.height

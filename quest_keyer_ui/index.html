@@ -53,16 +53,22 @@
         <div id="keyer">
           <h2>Keying Parameters</h2>
           <div class="scalar key-param">
-            <input type="color" name="Key Color Picker" id="color-picker">
             <label for="color-picker">Key Value/Color Picker</label>
+            <input type="color" name="Key Color Picker" id="color-picker">
           </div>
           <div class="key-param">
-            <input class="form-range" type="range" min="0" max="1" value="1" name="Threshold Slider" id="key-threshold" step="0.05">
             <label for="key-threshold">Range</label>
+            <input class="form-range" type="range" min="0" max="1" value="1" name="Threshold Slider" id="key-threshold" step="0.05">
           </div>
           <div class="key-param">
-            <input type="checkbox" name="Despill OnOff" id="despill-checkbox">
             <label for="despill-checkbox">Despill?</label>
+            <input type="checkbox" name="Despill OnOff" id="despill-checkbox">
+          </div>
+          <div class="key-param">
+            <label for="key-background">Example Background</label>
+            <select class="form-select" name="Key Background" id="key-background">
+              <option value="none">None</option>
+            </select>
           </div>
         </div>
       </div>

@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   sendBackendTest: () => ipcRenderer.invoke('keyer:initBackend'),
   openSequence: (path) => ipcRenderer.invoke('keyer:openSequence', path),
   exportSequence: (export_path, red, green, blue, threshold, applyDespill) => ipcRenderer.invoke('keyer:exportSequence', export_path, red, green, blue, threshold, applyDespill),
-  chromaKey: (red, green, blue, threshold, applyDespill) => ipcRenderer.invoke('keyer:chromaKey', red, green, blue, threshold, applyDespill)
+  chromaKey: (red, green, blue, threshold, applyDespill) => ipcRenderer.invoke('keyer:chromaKey', red, green, blue, threshold, applyDespill),
+  loadBackgroundImages: () => ipcRenderer.invoke('config:loadBackgroundImages')
 })
