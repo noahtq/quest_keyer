@@ -1,5 +1,5 @@
 # Quest Keyer
-C++/computer vision portfolio project by Noah Turnquist.  
+Computer vision and C++ portfolio project by Noah Turnquist.  
 Chromatic image and video keyer.  
 The chroma keying is done using Petro Vlahos' ultimatte keying technique.
 
