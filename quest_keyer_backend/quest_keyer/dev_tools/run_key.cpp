@@ -11,6 +11,8 @@
 using namespace std;
 using namespace Quest;
 
+const std::filesystem::path bg_path = "/Users/noahturnquist/Documents/Coding/vfx_software/quest_keyer/quest_keyer/quest_keyer_ui/media/key_backgrounds/beach.png";
+
 int main(int argc, char** argv) {
     if (argc != 6) {
         cerr << "Not enough arguments specified.\n";
@@ -45,6 +47,7 @@ int main(int argc, char** argv) {
 
         UltimatteKeyer(image_seq, image_seq, *key_vals, *threshold);
         Despill(image_seq, image_seq, *key_vals);
+        CompositeOverImage(image_seq, image_seq, bg_path);
 
         cv::Mat channels[4];
         cv::split(image_seq[0], channels);

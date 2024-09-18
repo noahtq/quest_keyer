@@ -54,5 +54,5 @@ class KeyerAPI : public drogon::HttpController<KeyerAPI>
 };
     // Helper functions
     bool VerifyKeyValues(const std::string &key_r, const std::string &key_g, const std::string &key_b,
-        const std::string &threshold, const std::string& despill);
+        const std::string &threshold, const std::string& despill, const std::string& background_path = "null");
 }

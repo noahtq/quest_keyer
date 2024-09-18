@@ -129,10 +129,8 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
     LOG_DEBUG << "Received Key Parameters from Client";
     assert(keyer_seq.get_frame_count() > 0);
 
-    LOG_DEBUG << background_path;
-
     Json::Value ret;
-    if (VerifyKeyValues(key_r, key_g, key_b, threshold, despill)) {
+    if (VerifyKeyValues(key_r, key_g, key_b, threshold, despill, background_path)) {
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
         const int b_val = std::stoi(key_b);
@@ -144,6 +142,11 @@ void KeyerAPI::ChromaKey(const HttpRequestPtr &req, std::function<void (const Ht
             LOG_DEBUG << "Despilling image";
             Quest::Despill(*keyer_proxy, *keyer_proxy, cv::Scalar(b_val, g_val, r_val));
         }
+
+        if (background_path != "null") {
+            Quest::CompositeOverImage(*keyer_proxy, *keyer_proxy, background_path);
+        }
+
         keyer_proxy->render(keyer_proxy->get_output_path());
 
         LOG_DEBUG << "Successfully keyed image";
@@ -216,7 +219,15 @@ void KeyerAPI::ExportSeq(const HttpRequestPtr& req, std::function<void(const Htt
 }
 
 bool QuestKeyerAPI::VerifyKeyValues(const std::string& key_r, const std::string& key_g, const std::string& key_b,
-    const std::string& threshold, const std::string& despill) {
+    const std::string& threshold, const std::string& despill, const std::string& background_path) {
+
+    if (background_path != "null") {
+        const cv::Mat img = cv::imread(background_path);
+        if (img.empty()) {
+            return false;
+        }
+    }
+
     try {
         const int r_val = std::stoi(key_r);
         const int g_val = std::stoi(key_g);
