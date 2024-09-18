@@ -1,0 +1,27 @@
+{
+    "checkerboard": {
+        "id": 1,
+        "name": "Checkerboard",
+        "path": "./media/key_backgrounds/checkerboard.png"
+    },
+    "pink": {
+        "id": 2,
+        "name": "Pink",
+        "path": "./media/key_backgrounds/pink.png"
+    },
+    "grey": {
+        "id": 3,
+        "name": "Grey",
+        "path": "./media/key_backgrounds/grey.png"
+    },
+    "urban": {
+        "id": 4,
+        "name": "Urban Grafitti",
+        "path": "./media/key_backgrounds/urban.png"
+    },
+    "beach": {
+        "id": 5,
+        "name": "Tropical Beach",
+        "path": "./media/key_backgrounds/beach.png"
+    }
+}

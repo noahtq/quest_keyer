@@ -1,5 +1,15 @@
 const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron/main')
 const path = require('node:path')
+const { resolve } = require('path')
+let backgroundImages = require('./media/key_backgrounds/background_info.json')
+
+// Populate background selector when program starts
+async function getBackgroundImages() {
+  for (image in backgroundImages) {
+    backgroundImages[image].path = resolve(backgroundImages[image].path)
+  }
+  return backgroundImages
+}
 
 async function handleFileSearch() {
   const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -72,8 +82,8 @@ async function handleExportSequence(event, export_path, red, green, blue, thresh
   }
 }
 
-async function handleChromaKey(event, red, green, blue, threshold, applyDespill) {
-  const url = `http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}&despill=${applyDespill}`
+async function handleChromaKey(event, red, green, blue, threshold, applyDespill, backgroundPath) {
+  const url = `http://localhost:5555/questkeyerapi/keyerapi/chromakey?keyr=${red}&keyg=${green}&keyb=${blue}&threshold=${threshold}&despill=${applyDespill}&background=${backgroundPath}`
   try {
     const response = await fetch(url)
 
@@ -111,6 +121,7 @@ app.whenReady().then(() => {
   ipcMain.handle('keyer:openSequence', handleOpenSequence)
   ipcMain.handle('keyer:exportSequence', handleExportSequence)
   ipcMain.handle('keyer:chromaKey', handleChromaKey)
+  ipcMain.handle('config:loadBackgroundImages', getBackgroundImages)
   const primaryDisplay = screen.getPrimaryDisplay()
   width = primaryDisplay.workAreaSize.width
   height = primaryDisplay.workAreaSize.height

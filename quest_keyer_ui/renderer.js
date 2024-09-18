@@ -26,12 +26,25 @@ const endBtn = document.getElementById('end-btn')
 const colorPicker = document.getElementById('color-picker')
 const thresholdSlider = document.getElementById('key-threshold')
 const despillCheckbox = document.getElementById('despill-checkbox')
+const keyBackgroundSelector = document.getElementById('key-background')
+populateBackgroundSelector()
 
 let viewerState = {
     originalProxyPath: "",
     keyedProxyPath: "",
     currentFrame: 1,
     frameLength: -1
+}
+
+async function populateBackgroundSelector() {
+    const backgroundImages = await window.electronAPI.loadBackgroundImages()
+    for (const image in backgroundImages) {
+        let newOption = document.createElement("option")
+        newOption.setAttribute("value", backgroundImages[image].id)
+        newOption.innerHTML = backgroundImages[image].name
+        keyBackgroundSelector.appendChild(newOption)
+    }
+    return backgroundImages
 }
 
 inputSearchBtn.addEventListener('click', async () => {
@@ -73,41 +86,53 @@ sequenceExportBtn.addEventListener('click', async () => {
     }
 })
 
-colorPicker.addEventListener('input', async () => {
-    if (viewerState.frameLength > 0) {
-        const color = colorPicker.value
-        const r = parseInt(color.substr(1,2), 16)
-        const g = parseInt(color.substr(3,2), 16)
-        const b = parseInt(color.substr(5,2), 16)
-        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
-        viewerUpdate(updateData)
+async function getBackgroundPath() {
+    const backgroundImages = await window.electronAPI.loadBackgroundImages()
+    const backgroundID = keyBackgroundSelector.value
+    for (const image in backgroundImages) {
+        if (backgroundImages[image].id === Number(backgroundID)) {
+            return backgroundImages[image].path
+        }
     }
-})
+    return null
+}
 
-thresholdSlider.addEventListener('change', async () => {
+async function keyImage() {
     if (viewerState.frameLength > 0) {
         const color = colorPicker.value
         const r = parseInt(color.substr(1,2), 16)
         const g = parseInt(color.substr(3,2), 16)
         const b = parseInt(color.substr(5,2), 16)
-        const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
-        viewerUpdate(updateData)
-    }
-})
-
-despillCheckbox.addEventListener('click', async () => {
-    if (viewerState.frameLength > 0) {
-        const color = colorPicker.value
-        const r = parseInt(color.substr(1,2), 16)
-        const g = parseInt(color.substr(3,2), 16)
-        const b = parseInt(color.substr(5,2), 16)
+        let backgroundPath = null;
+        if (keyBackgroundSelector.value != 'none') {
+            backgroundPath = await getBackgroundPath()
+            if (!backgroundPath) {
+                console.error("There was an error getting the background image path")
+            }
+        }
         if (r > 0 || g > 0 || b > 0) {
-            const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked)
+            const updateData = await window.electronAPI.chromaKey(r, g, b, thresholdSlider.value, despillCheckbox.checked, backgroundPath)
             viewerUpdate(updateData)
         } else {
             despillCheckbox.checked = false
         }
     }
+}
+
+colorPicker.addEventListener('input', async () => {
+    keyImage()
+})
+
+thresholdSlider.addEventListener('change', async () => {
+    keyImage()
+})
+
+despillCheckbox.addEventListener('click', async () => {
+    keyImage()
+})
+
+keyBackgroundSelector.addEventListener('change', async () => {
+    keyImage()
 })
 
 prevFrameBtn.addEventListener('click', () => {

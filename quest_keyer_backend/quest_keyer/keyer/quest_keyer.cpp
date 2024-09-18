@@ -55,7 +55,9 @@ void Quest::UltimatteKeyer(const ImageSeq& original_seq, ImageSeq& destination_s
 }
 
 void Quest::Despill(const ImageSeq& original_seq, ImageSeq& destination_seq, const cv::Scalar& key_value) {
-    assert(key_value[0] > 0 || key_value[1] > 0 || key_value[2] > 0);
+    if (key_value[0] > 0 || key_value[1] > 0 || key_value[2] > 0) {
+        throw KeyerException("The key value can not be pure black (0, 0, 0)");
+    }
     int despill_channel = 0;
     int max_val = static_cast<int>(key_value[0]);
     for (int i = 1; i < 3; i++) {
@@ -76,4 +78,35 @@ void Quest::Despill(const ImageSeq& original_seq, ImageSeq& destination_seq, con
         }
     }
 }
+
+void Quest::CompositeOverImage(const ImageSeq& original_seq, ImageSeq& destination_seq, const std::filesystem::path& bg_path) {
+    cv::Mat bg = cv::imread(bg_path);
+    if (bg.empty()) {
+        throw(KeyerException("Could not open background image at path"));
+    }
+    cv::resize(bg, bg, cv::Size(original_seq.get_width(), original_seq.get_height()), 0, 0);
+    bg.convertTo(bg, CV_8UC4);
+    cv::Mat bg_channels[4];
+    cv::split(bg, bg_channels);
+    const cv::Size frame_size = cv::Size(bg.cols, bg.rows);
+    const cv::Mat pure_black(frame_size, CV_8UC1, cv::Scalar(0));
+    pure_black.copyTo(bg_channels[3]);
+
+    for (int i = 0; i < original_seq.get_frame_count(); i++) {
+        cv::Mat fg_channels[4];
+        cv::split(original_seq.get_frame(i), fg_channels);
+
+        cv::Mat current_bg_channels[4];
+        // Subtract the alpha value from each channel in the bg
+        for (int c = 0; c < 4; c++) {
+            bg_channels[c].copyTo(current_bg_channels[c]);
+            current_bg_channels[c] -= fg_channels[3];
+        }
+
+        cv::Mat current_bg;
+        cv::merge(current_bg_channels, 4, current_bg);
+        cv::add(original_seq.get_frame(i), current_bg, destination_seq[i]);
+    }
+}
+
 
