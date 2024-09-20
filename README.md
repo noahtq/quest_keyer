@@ -2,6 +2,7 @@
 Computer vision and C++ portfolio project by Noah Turnquist.  
 Chromatic image and video keyer.  
 The chroma keying is done using Petro Vlahos' ultimatte keying technique.
+[Showcase video](https://youtu.be/i_TsfFqh7Fk)
 
 ## Tech Stack
 ### Backend
@@ -26,7 +27,13 @@ $ git clone https://github.com/noahtq/quest_keyer.git && cd quest_keyer
 4. Once both the frontend and backend have been setup correctly, running the application is straightforward. First start the backend REST API `$ <backend build directory>/quest_keyer_backend`. Then start the frontend by navigating to the UI directory and running `$ npm run start`
 5. Finally, test that the application is working correctly by downloading the test media located in this [Google Drive folder](https://drive.google.com/drive/folders/1EenDnNi4WRRIemVCvxgemVoAQojeklv0?usp=sharing). Try keying an image sequence and then exporting it.
 
-## Versions (Current 0.0.1)
+## Versions (Current 0.0.2)
+### 0.0.2
+- Fully implemented Ultimatte keying functionality
+- Finished implementing basic frontend functionality, such as selecting file paths from finder window and adding background to check your keying
+- Fixed some bugs
+- Backend now launches UI in production mode
+
 ### 0.0.1
 - Implemented core functionality for both frontend and backend
 - Quest Keyer very simple keying functionality
